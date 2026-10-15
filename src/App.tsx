@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import Footer, { FloatingButtons } from "./components/Footer";
@@ -25,18 +25,27 @@ function ScrollToTop() {
 /* -------------------------- loader ---------------------------------- */
 
 function InitialLoader({ onComplete }: { onComplete: () => void }) {
+  const prefersReducedMotion = useReducedMotion();
+
   useEffect(() => {
+    if (prefersReducedMotion) {
+      onComplete();
+      return;
+    }
     // Failsafe: force complete after 4s in case animation stalls (e.g. background tab)
     const timer = setTimeout(onComplete, 4000);
     return () => clearTimeout(timer);
-  }, [onComplete]);
+  }, [onComplete, prefersReducedMotion]);
 
   return (
     <motion.div
       className="fixed inset-0 z-[500] flex flex-col items-center justify-center bg-forest-900"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, y: "-100%" }}
-      transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
+      transition={{
+        duration: prefersReducedMotion ? 0.01 : 0.8,
+        ease: [0.65, 0, 0.35, 1],
+      }}
     >
       <video
         className="absolute inset-0 h-full w-full object-cover opacity-70"
@@ -55,19 +64,25 @@ function InitialLoader({ onComplete }: { onComplete: () => void }) {
            className="h-28 w-28 rounded-2xl bg-white object-contain p-2 drop-shadow-2xl"
            initial={{ opacity: 0, scale: 0.8, y: 20 }}
            animate={{ opacity: 1, scale: 1, y: 0 }}
-           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+           transition={{
+             duration: prefersReducedMotion ? 0.01 : 0.8,
+             ease: [0.22, 1, 0.36, 1],
+           }}
         />
         <motion.div
           className="mt-8 h-1 w-48 overflow-hidden rounded-full bg-white/20"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: prefersReducedMotion ? 0 : 0.4 }}
         >
           <motion.div 
             className="h-full bg-gold-400"
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
-            transition={{ duration: 3, ease: "easeInOut" }}
+            transition={{
+              duration: prefersReducedMotion ? 0.01 : 3,
+              ease: "easeInOut",
+            }}
             onAnimationComplete={onComplete}
           />
         </motion.div>
@@ -79,12 +94,29 @@ function InitialLoader({ onComplete }: { onComplete: () => void }) {
 /* -------------------------- page transition ------------------------- */
 
 function PageShell({ children }: { children: React.ReactNode }) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      exit={{ opacity: 0, y: -12, filter: "blur(4px)" }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      initial={
+        prefersReducedMotion
+          ? { opacity: 0 }
+          : { opacity: 0, y: 12, filter: "blur(4px)" }
+      }
+      animate={
+        prefersReducedMotion
+          ? { opacity: 1 }
+          : { opacity: 1, y: 0, filter: "blur(0px)" }
+      }
+      exit={
+        prefersReducedMotion
+          ? { opacity: 0 }
+          : { opacity: 0, y: -12, filter: "blur(4px)" }
+      }
+      transition={{
+        duration: prefersReducedMotion ? 0.01 : 0.5,
+        ease: [0.22, 1, 0.36, 1],
+      }}
     >
       {children}
     </motion.div>
@@ -127,19 +159,21 @@ export default function App() {
   }, [loading]);
 
   return (
-    <HashRouter>
-      <ScrollToTop />
+    <MotionConfig reducedMotion="user">
+      <HashRouter>
+        <ScrollToTop />
 
-      <AnimatePresence>
-        {loading && <InitialLoader key="loader" onComplete={() => setLoading(false)} />}
-      </AnimatePresence>
+        <AnimatePresence>
+          {loading && <InitialLoader key="loader" onComplete={() => setLoading(false)} />}
+        </AnimatePresence>
 
-      <Navbar />
-      <main>
-        <AppRoutes />
-      </main>
-      <Footer />
-      <FloatingButtons />
-    </HashRouter>
+        <Navbar />
+        <main>
+          <AppRoutes />
+        </main>
+        <Footer />
+        <FloatingButtons />
+      </HashRouter>
+    </MotionConfig>
   );
 }

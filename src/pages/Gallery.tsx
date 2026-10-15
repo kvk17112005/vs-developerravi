@@ -4,6 +4,8 @@ import {
   EASE,
   Icon,
   Lightbox,
+  ParallaxImage,
+  TextReveal,
   usePageTitle,
 } from "../components/ui";
 import { PROJECTS, type GalleryItem } from "../data/site";
@@ -77,11 +79,15 @@ export default function Gallery() {
               <span className="h-px w-9 bg-gold-500/70" />
             </div>
             <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-6xl">
-              Green, in <em className="text-forest-600">every frame.</em>
+              <TextReveal mode="character">
+                Green, in <em className="text-forest-600">every frame.</em>
+              </TextReveal>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-              Aerial surveys, owner-built villas, avenue trees and drone flyovers —
-              the VS portfolio as it stands today.
+              <TextReveal>
+                Aerial surveys, owner-built villas, avenue trees and drone flyovers —
+                the VS portfolio as it stands today.
+              </TextReveal>
             </p>
           </motion.div>
         </div>
@@ -155,11 +161,12 @@ export default function Gallery() {
                         />
                       ) : (
                         <>
-                          <img
+                          <ParallaxImage
                             src={g.src}
                             alt={g.caption}
                             loading="lazy"
                             className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                            depth={12}
                           />
                           <span className="absolute inset-0 bg-gradient-to-t from-forest-900/60 via-transparent to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
                           <span className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">

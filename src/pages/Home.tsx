@@ -29,6 +29,7 @@ import {
   Reveal,
   Scroll3D,
   SectionHeading,
+  TextReveal,
   TiltCard,
   TrustBadges,
   useIsDesktop,
@@ -102,9 +103,11 @@ function Hero() {
           transition={{ delay: 0.35, duration: 0.9, ease: EASE }}
           className="mt-4 max-w-4xl font-display text-[42px] font-semibold leading-[1.04] tracking-tight text-white drop-shadow-xl sm:text-6xl lg:text-7xl"
         >
-          Own a piece of Bengaluru's
-          <span className="text-mint-200"> greenest </span>
-          <em className="text-gold-300">future.</em>
+          <TextReveal mode="character">
+            Own a piece of Bengaluru's
+            <span className="text-mint-200"> greenest </span>
+            <em className="text-gold-300">future.</em>
+          </TextReveal>
         </motion.h1>
 
         <motion.p
@@ -113,8 +116,10 @@ function Hero() {
           transition={{ delay: 0.5, duration: 0.8, ease: EASE }}
           className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg"
         >
-          DTCP approved & DC converted gated layouts with wide tree-lined roads, ready
-          utilities and bank-ready titles — 1800+ plots across 110+ acres, since 2014.
+          <TextReveal>
+            DTCP approved & DC converted gated layouts with wide tree-lined roads, ready
+            utilities and bank-ready titles — 1800+ plots across 110+ acres, since 2014.
+          </TextReveal>
         </motion.p>
 
         <motion.div

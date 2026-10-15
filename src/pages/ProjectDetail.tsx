@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { lazy, Suspense, useState } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { lazy, Suspense, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import {
   CONTACT,
@@ -16,8 +16,10 @@ import {
   inputCls,
   Lightbox,
   Magnetic,
+  ParallaxImage,
   Reveal,
   SectionHeading,
+  TextReveal,
   TrustBadges,
   usePageTitle,
 } from "../components/ui";
@@ -38,6 +40,22 @@ function ViewportFallback() {
 }
 
 export default function ProjectDetail() {
+  const heroRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroScale = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [1, 1] : [1, 1.12],
+  );
+  const heroY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [0, 64],
+  );
   const { slug } = useParams();
   const project = getProject(slug ?? "");
   const [lb, setLb] = useState<number | null>(null);
@@ -67,8 +85,9 @@ export default function ProjectDetail() {
   return (
     <>
       {/* ---------- hero ---------- */}
-      <section className="relative h-[72vh] min-h-[480px] overflow-hidden">
-        <video
+      <section ref={heroRef} className="relative h-[72vh] min-h-[480px] overflow-hidden">
+        <motion.video
+          style={{ scale: heroScale, y: heroY }}
           className="absolute inset-0 h-full w-full object-cover"
           src={project.video}
           poster={project.heroImage}
@@ -103,11 +122,11 @@ export default function ProjectDetail() {
               {project.status}
             </span>
             <h1 className="mt-4 font-display text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
-              {project.name}
+              <TextReveal mode="character">{project.name}</TextReveal>
             </h1>
             <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-mint-200 sm:text-base">
               <Icon name="mapPin" className="h-4.5 w-4.5 text-gold-300" />
-              {project.location}
+              <TextReveal>{project.location}</TextReveal>
             </p>
           </motion.div>
         </div>
@@ -154,11 +173,13 @@ export default function ProjectDetail() {
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-                {project.tagline}
+                  <TextReveal mode="character">{project.tagline}</TextReveal>
               </h2>
             </Reveal>
             <Reveal delay={0.12}>
-              <p className="mt-6 leading-relaxed text-forest-900/70">{project.about}</p>
+              <p className="mt-6 leading-relaxed text-forest-900/70">
+                <TextReveal>{project.about}</TextReveal>
+              </p>
             </Reveal>
             <Reveal delay={0.2} className="mt-8">
               <TrustBadges />
@@ -251,6 +272,11 @@ export default function ProjectDetail() {
                 In the middle of
                 <em className="text-forest-600"> everything.</em>
               </h2>
+              {project.address && (
+                <address className="mt-4 not-italic text-sm font-medium text-forest-800/70">
+                  {project.address}
+                </address>
+              )}
             </Reveal>
             <div className="mt-8 space-y-4">
               {project.locationAdvantages.map((l, i) => (
@@ -274,7 +300,7 @@ export default function ProjectDetail() {
                   rel="noopener noreferrer"
                   className="absolute left-4 top-4 z-20 flex items-center gap-1.5 rounded-full border border-forest-600/20 bg-white/95 px-3.5 py-1.5 text-xs font-bold text-forest-800 shadow-md backdrop-blur transition hover:bg-forest-50 hover:text-forest-900"
                 >
-                  <span>Open in Maps</span>
+                  <span>View Location</span>
                   <Icon name="external" className="h-3.5 w-3.5 text-forest-600" />
                 </a>
               )}
@@ -285,6 +311,17 @@ export default function ProjectDetail() {
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
+              {project.directionsUrl && (
+                <a
+                  href={project.directionsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between gap-3 bg-forest-800 px-6 py-4 text-sm font-bold text-white transition hover:bg-forest-900"
+                >
+                  <span>Get Directions</span>
+                  <Icon name="external" className="h-4 w-4 text-mint-300" />
+                </a>
+              )}
             </div>
           </Reveal>
         </div>
@@ -310,13 +347,14 @@ export default function ProjectDetail() {
                     i === 0 ? "col-span-2 row-span-2" : ""
                   }`}
                 >
-                  <img
+                  <ParallaxImage
                     src={g.src.replace("w=1600&h=1000", i === 0 ? "w=1600&h=1200" : "w=800&h=600")}
                     alt={g.caption}
                     loading="lazy"
                     className={`w-full object-cover transition duration-700 group-hover:scale-105 ${
                       i === 0 ? "h-72 sm:h-[420px]" : "h-40 sm:h-52"
                     }`}
+                    depth={12}
                   />
                   {g.type === "360" && (
                     <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-forest-900/80 px-3 py-1.5 text-[10px] font-bold text-white backdrop-blur">

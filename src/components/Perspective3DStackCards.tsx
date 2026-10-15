@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { useRef } from "react";
 import { CONTACT } from "../data/site";
 import { Icon, WhatsAppGlyph } from "./ui";
 
@@ -149,16 +150,23 @@ const STACK_CARDS: StackCard[] = [
 
 function ScrollStackCard({
   card,
+  index,
+  progress,
 }: {
   card: StackCard;
+  index: number;
+  progress: MotionValue<number>;
 }) {
+  const start = index / STACK_CARDS.length;
+  const end = (index + 1) / STACK_CARDS.length;
+  const y = useTransform(progress, [start, end], ["110%", "0%"]);
+  const scale = useTransform(progress, [start, end], [0.96, 1]);
+  const opacity = useTransform(progress, [start, end], [0, 1]);
+
   return (
     <motion.div
-      initial={{ y: 80, opacity: 0 }}
-      whileInView={{ y: 0, opacity: 1 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`sticky top-6 h-[600px] overflow-hidden rounded-[2.25rem] border border-white/20 p-6 shadow-2xl backdrop-blur-xl sm:h-[500px] sm:p-10 bg-gradient-to-br ${card.bgGradient}`}
+      style={{ y: index === 0 ? 0 : y, scale: index === 0 ? 1 : scale, opacity: index === 0 ? 1 : opacity, zIndex: index + 1 }}
+      className={`absolute inset-0 overflow-hidden rounded-[2.25rem] border border-white/20 p-6 shadow-2xl backdrop-blur-xl sm:p-10 bg-gradient-to-br ${card.bgGradient}`}
     >
       <div className="grid h-full items-center gap-6 sm:grid-cols-12 sm:gap-8">
         <div className="flex flex-col justify-between sm:col-span-7">
@@ -237,8 +245,14 @@ function ScrollStackCard({
 }
 
 export default function Perspective3DStackCards() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
   return (
-    <section className="relative overflow-hidden bg-white py-20 sm:py-28">
+    <section ref={sectionRef} className="relative overflow-hidden bg-white py-20 sm:py-28">
       {/* Background Subtle Gradient */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#FAF7F0] to-transparent" />
 
@@ -260,16 +274,19 @@ export default function Perspective3DStackCards() {
           </p>
         </div>
 
-        <div className="relative mt-12 [perspective:1400px]">
-          {STACK_CARDS.map((card, index) => (
-            <div
-              key={card.id}
-              className={`relative h-[calc(100vh-3rem)] min-h-[560px] ${index > 0 ? "-mt-16" : ""}`}
-              style={{ zIndex: index + 1 }}
-            >
-              <ScrollStackCard card={card} />
+        <div className="relative mt-12 h-[500vh]">
+          <div className="sticky top-6 flex h-[600px] items-center justify-center [perspective:1400px] sm:h-[500px]">
+            <div className="relative h-full w-full max-w-4xl">
+              {STACK_CARDS.map((card, index) => (
+                <ScrollStackCard
+                  key={card.id}
+                  card={card}
+                  index={index}
+                  progress={scrollYProgress}
+                />
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

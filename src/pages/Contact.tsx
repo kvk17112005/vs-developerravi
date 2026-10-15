@@ -8,6 +8,7 @@ import {
   inputCls,
   Magnetic,
   Reveal,
+  TextReveal,
   TrustBadges,
   usePageTitle,
   WhatsAppGlyph,
@@ -84,11 +85,15 @@ export default function Contact() {
               <span className="h-px w-9 bg-gold-500/70" />
             </div>
             <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-6xl">
-              The desk is <em className="text-forest-600">always open.</em>
+              <TextReveal mode="character">
+                The desk is <em className="text-forest-600">always open.</em>
+              </TextReveal>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-              Drop by our Bhattarahalli office for a coffee and a look at the original
-              approval papers — or just call. We answer on the second ring.
+              <TextReveal>
+                Drop by our Bhattarahalli office for a coffee and a look at the original
+                approval papers — or just call. We answer on the second ring.
+              </TextReveal>
             </p>
           </motion.div>
           <motion.div

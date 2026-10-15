@@ -145,6 +145,7 @@ export interface Project {
   shortName: string;
   tagline: string;
   location: string;
+  address?: string;
   status: "Sold Out" | "100% Sold Out" | "Completed" | "Selling" | "New Launch" | "Limited Plots";
   areaAcres: number;
   plotCount: number;
@@ -160,6 +161,7 @@ export interface Project {
   about: string;
   mapEmbed?: string;
   mapUrl?: string;
+  directionsUrl?: string;
 }
 
 export const PROJECTS: Project[] = [
@@ -221,7 +223,8 @@ export const PROJECTS: Project[] = [
     name: "VS Rosemeadows",
     shortName: "Rosemeadows",
     tagline: "4.7 acres of flowering avenues on the Sulibele growth corridor.",
-    location: "Sulibele Road, Hoskote",
+    location: "Vemagal–Kurugal, Karnataka",
+    address: "Vemagal–Kurugal, Karnataka 563157, India",
     status: "Sold Out",
     areaAcres: 4.7,
     plotCount: 71,
@@ -230,7 +233,8 @@ export const PROJECTS: Project[] = [
     heroImage: "/projects/rose/rose-1.jpg",
     video: "https://videos.pexels.com/video-files/33700929/14314063_3840_2160_30fps.mp4",
     mapEmbed: "https://maps.google.com/maps?q=13.2210196,77.9708434&hl=en&z=16&output=embed",
-    mapUrl: "https://www.google.com/maps/place/VS+ROSE+Meadows/@13.2210196,77.9708434,17z/data=!3m1!4b1!4m6!3m5!1s0x3badff003a519a3d:0xe6a6370eb6b4069b!8m2!3d13.2210196!4d77.9708434!16s%2Fg%2F11xdgpv3y6!18m1!1e1",
+    mapUrl: "https://maps.app.goo.gl/rF3kqMzLJAbEWFNV9",
+    directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=13.2210196%2C77.9708434",
     about:
       "4.7 acres of flowering avenues on the Sulibele growth corridor — DC / DTCP approved, with a rose-and-tabebuia theme woven through the master plan.",
     highlights: [

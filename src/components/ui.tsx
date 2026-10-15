@@ -12,6 +12,9 @@ import {
   useEffect,
   useRef,
   useState,
+  Children,
+  cloneElement,
+  isValidElement,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
@@ -283,11 +286,22 @@ export function Reveal({
   className?: string;
   once?: boolean;
 }) {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={
+        prefersReducedMotion
+          ? false
+          : { opacity: 0, y, scale: 0.985, filter: "blur(7px)" }
+      }
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        filter: "blur(0px)",
+      }}
       viewport={{ once, margin: "-70px" }}
       transition={{ duration: 0.85, delay, ease: EASE }}
     >
@@ -324,7 +338,7 @@ export function SectionHeading({
           light ? "text-white" : "text-forest-900",
         )}
       >
-        {title}
+        <TextReveal>{title}</TextReveal>
       </h2>
       {sub && (
         <p
@@ -333,10 +347,166 @@ export function SectionHeading({
             light ? "text-white/75" : "text-forest-900/65",
           )}
         >
-          {sub}
+          <TextReveal>{sub}</TextReveal>
         </p>
       )}
     </Reveal>
+  );
+}
+
+function textContent(node: ReactNode): string {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(textContent).join("");
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    if (node.type === "br") return " ";
+    return textContent(node.props.children);
+  }
+  return "";
+}
+
+export function TextReveal({
+  children,
+  mode = "word",
+}: {
+  children: ReactNode;
+  mode?: "word" | "character";
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-72px" });
+  const prefersReducedMotion = useReducedMotion();
+  let revealIndex = 0;
+
+  const renderText = (node: ReactNode): ReactNode =>
+    Children.map(node, (child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return String(child)
+          .split(/(\s+)/)
+          .map((part) => {
+            if (!part || /^\s+$/.test(part)) return part;
+
+            if (mode === "character") {
+              return Array.from(part).map((character) => {
+                const index = revealIndex++;
+                return (
+                  <motion.span
+                    key={`char-${index}`}
+                    className="inline-block"
+                    initial={
+                      prefersReducedMotion
+                        ? false
+                        : { opacity: 0, y: 9, filter: "blur(5px)" }
+                    }
+                    animate={
+                      inView
+                        ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                        : undefined
+                    }
+                    transition={{
+                      duration: 0.48,
+                      delay: index * 0.012,
+                      ease: EASE,
+                    }}
+                  >
+                    {character}
+                  </motion.span>
+                );
+              });
+            }
+
+            const index = revealIndex++;
+            return (
+              <motion.span
+                key={`word-${index}`}
+                className="inline-block"
+                initial={
+                  prefersReducedMotion
+                    ? false
+                    : { opacity: 0, y: 12, filter: "blur(5px)" }
+                }
+                animate={
+                  inView
+                    ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                    : undefined
+                }
+                transition={{
+                  duration: 0.55,
+                  delay: index * 0.055,
+                  ease: EASE,
+                }}
+              >
+                {part}
+              </motion.span>
+            );
+          });
+      }
+
+      if (isValidElement<{ children?: ReactNode }>(child)) {
+        return cloneElement(child, {
+          children: renderText(child.props.children),
+        });
+      }
+
+      return child;
+    });
+
+  return (
+    <span ref={ref} className="text-reveal">
+      <span className="sr-only">{textContent(children)}</span>
+      <span aria-hidden="true">{renderText(children)}</span>
+    </span>
+  );
+}
+
+export function ParallaxImage({
+  src,
+  alt,
+  className,
+  loading,
+  decoding = "async",
+  depth = 18,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  loading?: "eager" | "lazy";
+  decoding?: "async" | "auto" | "sync";
+  depth?: number;
+}) {
+  const ref = useRef<HTMLImageElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [-depth, depth],
+  );
+
+  return (
+    <motion.img
+      ref={ref}
+      src={src}
+      alt={alt}
+      loading={loading}
+      decoding={decoding}
+      className={cn("will-change-transform", className)}
+      style={{ y, scale: prefersReducedMotion ? 1 : 1.08 }}
+      initial={
+        prefersReducedMotion
+          ? false
+          : { opacity: 0.7, clipPath: "inset(0 0 100% 0)" }
+      }
+      animate={
+        inView
+          ? { opacity: 1, clipPath: "inset(0 0 0% 0)" }
+          : undefined
+      }
+      whileHover={prefersReducedMotion ? undefined : { scale: 1.13 }}
+      transition={{ duration: 0.8, ease: EASE }}
+    />
   );
 }
 
@@ -362,6 +532,7 @@ export function Magnetic({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const x = useSpring(0, { stiffness: 220, damping: 18, mass: 0.5 });
   const y = useSpring(0, { stiffness: 220, damping: 18, mass: 0.5 });
   return (
@@ -370,6 +541,7 @@ export function Magnetic({
       className={cn("inline-block", className)}
       style={{ x, y }}
       onMouseMove={(e: ReactMouseEvent) => {
+        if (prefersReducedMotion) return;
         const r = ref.current?.getBoundingClientRect();
         if (!r) return;
         x.set((e.clientX - (r.left + r.width / 2)) * strength);
@@ -395,6 +567,7 @@ export function TiltCard({
   max?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const rx = useSpring(0, { stiffness: 200, damping: 22 });
   const ry = useSpring(0, { stiffness: 200, damping: 22 });
   return (
@@ -403,6 +576,7 @@ export function TiltCard({
       className={cn("preserve-3d", className)}
       style={{ rotateX: rx, rotateY: ry, transformPerspective: 1100 }}
       onMouseMove={(e: ReactMouseEvent) => {
+        if (prefersReducedMotion) return;
         const r = ref.current?.getBoundingClientRect();
         if (!r) return;
         const px = (e.clientX - r.left) / r.width - 0.5;
@@ -435,8 +609,13 @@ export function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const prefersReducedMotion = useReducedMotion();
   useEffect(() => {
     if (!inView || !ref.current) return;
+    if (prefersReducedMotion) {
+      ref.current.textContent = `${prefix}${to.toLocaleString("en-IN")}${suffix}`;
+      return;
+    }
     const controls = animate(0, to, {
       duration,
       ease: [0.16, 1, 0.3, 1],
@@ -446,10 +625,12 @@ export function CountUp({
       },
     });
     return () => controls.stop();
-  }, [inView, to, duration, prefix, suffix]);
+  }, [inView, to, duration, prefix, suffix, prefersReducedMotion]);
   return (
     <span ref={ref} className={className}>
-      {prefix}0{suffix}
+      {prefix}
+      {prefersReducedMotion ? to.toLocaleString("en-IN") : 0}
+      {suffix}
     </span>
   );
 }
@@ -547,14 +728,27 @@ export function Scroll3D({
   scaleEffect?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  const rotateX = useTransform(scrollYProgress, [0, 0.45, 1], [intensity, 0, -intensity * 0.7]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], scaleEffect ? [0.94, 1, 0.96] : [1, 1, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.8, 1, 1, 0.85]);
+  const rotateX = useTransform(
+    scrollYProgress,
+    [0, 0.45, 1],
+    prefersReducedMotion ? [0, 0, 0] : [intensity, 0, -intensity * 0.7],
+  );
+  const scale = useTransform(
+    scrollYProgress,
+    [0, 0.5, 1],
+    prefersReducedMotion || !scaleEffect ? [1, 1, 1] : [0.94, 1, 0.96],
+  );
+  const opacity = useTransform(
+    scrollYProgress,
+    [0, 0.2, 0.8, 1],
+    prefersReducedMotion ? [1, 1, 1, 1] : [0.8, 1, 1, 0.85],
+  );
 
   return (
     <div ref={ref} style={{ perspective: 1000 }} className={className}>
@@ -583,12 +777,17 @@ export function Parallax3DLayer({
   depth?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [-depth, depth]);
+  const y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [-depth, depth],
+  );
 
   return (
     <div ref={ref} className={className}>

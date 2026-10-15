@@ -8,6 +8,7 @@ import {
   inputCls,
   Reveal,
   SectionHeading,
+  TextReveal,
   usePageTitle,
 } from "../components/ui";
 import { CONTACT, ROLES } from "../data/site";
@@ -62,12 +63,16 @@ export default function Careers() {
               <span className="h-px w-9 bg-gold-500/70" />
             </div>
             <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-6xl">
-              Grow roots <em className="text-forest-600">with us.</em>
+              <TextReveal mode="character">
+                Grow roots <em className="text-forest-600">with us.</em>
+              </TextReveal>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-              We're a small, senior team that treats every layout like a family
-              project. If you care about land, documents and people — in that order —
-              write to us.
+              <TextReveal>
+                We're a small, senior team that treats every layout like a family
+                project. If you care about land, documents and people — in that order —
+                write to us.
+              </TextReveal>
             </p>
           </motion.div>
         </div>

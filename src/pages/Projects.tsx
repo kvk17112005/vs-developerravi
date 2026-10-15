@@ -5,7 +5,9 @@ import {
   EASE,
   Icon,
   Magnetic,
+  ParallaxImage,
   Reveal,
+  TextReveal,
   WhatsAppGlyph,
   usePageTitle,
 } from "../components/ui";
@@ -49,13 +51,17 @@ export default function Projects() {
               CURATED PLOTTED DEVELOPMENTS
             </div>
             <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-950 sm:text-6xl">
-              Three layouts.{" "}
-              <span className="relative inline-block italic font-normal text-forest-900 underline decoration-gold-400 decoration-2 underline-offset-8">
-                One standard.
-              </span>
+              <TextReveal mode="character">
+                Three layouts.{" "}
+                <span className="relative inline-block italic font-normal text-forest-900 underline decoration-gold-400 decoration-2 underline-offset-8">
+                  One standard.
+                </span>
+              </TextReveal>
             </h1>
             <p className="mt-5 text-base leading-relaxed text-forest-900/70 sm:text-lg">
-              Every VS layout is DTCP approved & DC converted before it reaches this page. Explore each — then come walk the land.
+              <TextReveal>
+                Every VS layout is DTCP approved & DC converted before it reaches this page. Explore each — then come walk the land.
+              </TextReveal>
             </p>
           </motion.div>
         </div>
@@ -80,7 +86,7 @@ export default function Projects() {
             const statusBadgeColor = "bg-[#1f6b3d] text-white";
 
             return (
-              <Reveal key={p.slug} delay={0.1}>
+              <Reveal key={p.slug} delay={idx * 0.12} y={36}>
                 <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                   {/* Image Column */}
                   <div
@@ -89,11 +95,12 @@ export default function Projects() {
                       isEven && "lg:order-2"
                     )}
                   >
-                    <img
+                    <ParallaxImage
                       src={p.heroImage}
                       alt={p.name}
                       loading="lazy"
                       className="h-[360px] w-full object-cover sm:h-[440px] transition-transform duration-700 group-hover:scale-105"
+                      depth={22}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-forest-950/40 via-transparent to-transparent" />
                   </div>
@@ -115,7 +122,7 @@ export default function Projects() {
 
                     {/* Title & Location */}
                     <h2 className="mt-4 font-display text-4xl font-semibold text-forest-950 sm:text-5xl">
-                      {p.name}
+                      <TextReveal mode="character">{p.name}</TextReveal>
                     </h2>
                     <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-forest-700">
                       <Icon name="mapPin" className="h-4 w-4 text-forest-600 shrink-0" />
@@ -136,7 +143,7 @@ export default function Projects() {
 
                     {/* Description */}
                     <p className="mt-6 text-base leading-relaxed text-forest-900/70">
-                      {p.about}
+                      <TextReveal>{p.about}</TextReveal>
                     </p>
 
                     {/* Buttons */}
@@ -173,11 +180,19 @@ export default function Projects() {
 
       {/* Trust Strip */}
       <section className="border-y border-forest-600/10 bg-mint-50/50 py-6 overflow-hidden">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 px-5 sm:px-8 text-xs font-bold text-forest-800 uppercase tracking-widest flex-wrap">
-          {TRUST_TICKER.map((item) => (
-            <div key={item} className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rotate-45 bg-gold-600" />
-              <span>{item}</span>
+        <div className="animate-marquee marquee-track flex w-max text-xs font-bold uppercase tracking-widest text-forest-800">
+          {[0, 1, 2, 3, 4].map((copy) => (
+            <div
+              key={copy}
+              aria-hidden={copy !== 0}
+              className="marquee-group flex shrink-0 items-center gap-6 pr-6"
+            >
+              {TRUST_TICKER.map((item) => (
+                <div key={`${copy}-${item}`} className="flex shrink-0 items-center gap-2">
+                  <span className="h-1.5 w-1.5 rotate-45 bg-gold-600" />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -230,4 +245,3 @@ export default function Projects() {
     </div>
   );
 }
-
