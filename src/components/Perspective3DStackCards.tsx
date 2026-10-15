@@ -166,7 +166,7 @@ function ScrollStackCard({
   return (
     <motion.div
       style={{ y: index === 0 ? 0 : y, scale: index === 0 ? 1 : scale, opacity: index === 0 ? 1 : opacity, zIndex: index + 1 }}
-      className={`absolute inset-0 overflow-hidden rounded-[2.25rem] border border-white/20 p-6 shadow-2xl backdrop-blur-xl sm:p-10 bg-gradient-to-br ${card.bgGradient}`}
+      className={`group absolute inset-0 overflow-hidden rounded-[2.25rem] border border-white/20 p-6 shadow-2xl backdrop-blur-xl sm:p-10 bg-gradient-to-br ${card.bgGradient}`}
     >
       <div className="grid h-full items-center gap-6 sm:grid-cols-12 sm:gap-8">
         <div className="flex flex-col justify-between sm:col-span-7">
@@ -180,7 +180,7 @@ function ScrollStackCard({
               </span>
             </div>
 
-            <h3 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
+            <h3 className="mt-3 font-display text-2xl font-bold text-white transition-colors duration-500 group-hover:text-gold-300 sm:text-3xl lg:text-4xl">
               {card.title}
             </h3>
 

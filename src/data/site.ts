@@ -33,9 +33,6 @@ export const STATS = [
 
 /* ------------------------------ media helpers ---------------------- */
 
-const px = (id: number, w = 1600, h = 1000) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${h}`;
-
 // Public direct-stream URL for the client-provided Google Drive video.
 export const HERO_VIDEO = "/hero-video.mp4";
 export const HERO_POSTER = "/hero-poster.jpg";
@@ -91,9 +88,9 @@ function makeLayout(
       if (c === roadCol || r === roadRow) continue;
       const x = (c - center.c) * (cell + gap);
       const z = (r - center.r) * (cell + gap);
-      const isEdge =
-        c === 0 || r === 0 || c === cols - 1 || r === rows - 1 ||
-        c === roadCol + 1 || c === roadCol - 1 || r === roadRow + 1 || r === roadRow - 1;
+      // const isEdge =
+      //   c === 0 || r === 0 || c === cols - 1 || r === rows - 1 ||
+      //   c === roadCol + 1 || c === roadCol - 1 || r === roadRow + 1 || r === roadRow - 1;
 
       const distCenter = Math.abs(c - center.c) + Math.abs(r - center.r);
       if (parksList.length < parks && distCenter <= 2 && rnd() < 0.18) {

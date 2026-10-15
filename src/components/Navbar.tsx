@@ -128,7 +128,7 @@ export default function Navbar() {
                           />
                         </div>
                         <div className="p-3.5">
-                          <p className="font-display text-base font-semibold text-forest-800">
+                          <p className="font-display text-base font-semibold text-forest-800 transition-colors duration-300 group-hover:text-forest-600">
                             {p.name}
                           </p>
                           <p className="mt-0.5 line-clamp-1 text-[11px] text-forest-900/55">

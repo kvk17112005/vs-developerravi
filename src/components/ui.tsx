@@ -7,6 +7,7 @@ import {
   useSpring,
   useTransform,
   useReducedMotion,
+  type MotionValue,
 } from "framer-motion";
 import {
   useEffect,
@@ -277,12 +278,20 @@ export function Reveal({
   children,
   delay = 0,
   y = 30,
+  x = 0,
+  rotate = 0,
+  scale = 0.985,
+  blur = 7,
   className,
   once = true,
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
+  x?: number;
+  rotate?: number;
+  scale?: number;
+  blur?: number;
   className?: string;
   once?: boolean;
 }) {
@@ -291,14 +300,17 @@ export function Reveal({
   return (
     <motion.div
       className={className}
+      style={{ transformPerspective: 1200 }}
       initial={
         prefersReducedMotion
           ? false
-          : { opacity: 0, y, scale: 0.985, filter: "blur(7px)" }
+          : { opacity: 0, y, x, rotateX: rotate, scale, filter: `blur(${blur}px)` }
       }
       whileInView={{
         opacity: 1,
         y: 0,
+        x: 0,
+        rotateX: 0,
         scale: 1,
         filter: "blur(0px)",
       }}
@@ -316,12 +328,14 @@ export function SectionHeading({
   sub,
   center = true,
   light = false,
+  textEffect = "reveal",
 }: {
   eyebrow: string;
   title: ReactNode;
   sub?: string;
   center?: boolean;
   light?: boolean;
+  textEffect?: "reveal" | "scroll";
 }) {
   return (
     <Reveal className={cn("max-w-3xl", center && "mx-auto text-center")}>
@@ -338,7 +352,7 @@ export function SectionHeading({
           light ? "text-white" : "text-forest-900",
         )}
       >
-        <TextReveal>{title}</TextReveal>
+        {textEffect === "scroll" ? <ScrollText>{title}</ScrollText> : <TextReveal>{title}</TextReveal>}
       </h2>
       {sub && (
         <p
@@ -347,7 +361,7 @@ export function SectionHeading({
             light ? "text-white/75" : "text-forest-900/65",
           )}
         >
-          <TextReveal>{sub}</TextReveal>
+          {textEffect === "scroll" ? <ScrollText>{sub}</ScrollText> : <TextReveal>{sub}</TextReveal>}
         </p>
       )}
     </Reveal>
@@ -451,6 +465,101 @@ export function TextReveal({
 
   return (
     <span ref={ref} className="text-reveal">
+      <span className="sr-only">{textContent(children)}</span>
+      <span aria-hidden="true">{renderText(children)}</span>
+    </span>
+  );
+}
+
+/* Scroll-linked text reveal — each word brightens as the block scrolls up. */
+
+function ScrollWord({
+  children,
+  progress,
+  index,
+  total,
+  reduced,
+}: {
+  children: ReactNode;
+  progress: MotionValue<number>;
+  index: number;
+  total: number;
+  reduced: boolean;
+}) {
+  const start = total > 1 ? index / total : 0;
+  const end = total > 1 ? Math.min((index + 1.6) / total, 1) : 1;
+  const opacity = useTransform(progress, [start, end], [0.16, 1]);
+  const y = useTransform(progress, [start, end], [12, 0]);
+  const filter = useTransform(progress, [start, end], ["blur(6px)", "blur(0px)"]);
+
+  if (reduced) return <span className="scroll-word">{children}</span>;
+  return (
+    <motion.span className="scroll-word" style={{ opacity, y, filter }}>
+      {children}
+    </motion.span>
+  );
+}
+
+export function ScrollText({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.95", "start 0.55"],
+  });
+
+  let wordCount = 0;
+  const countWords = (node: ReactNode) => {
+    Children.forEach(node, (child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        wordCount += String(child).split(/\s+/).filter(Boolean).length;
+      } else if (isValidElement<{ children?: ReactNode }>(child)) {
+        countWords(child.props.children);
+      }
+    });
+  };
+  countWords(children);
+  const total = Math.max(wordCount, 1);
+
+  let i = 0;
+  const renderText = (node: ReactNode): ReactNode =>
+    Children.map(node, (child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return String(child)
+          .split(/(\s+)/)
+          .map((part) => {
+            if (!part || /^\s+$/.test(part)) return part;
+            const idx = i++;
+            return (
+              <ScrollWord
+                key={`sw-${idx}`}
+                progress={scrollYProgress}
+                index={idx}
+                total={total}
+                reduced={!!prefersReducedMotion}
+              >
+                {part}
+              </ScrollWord>
+            );
+          });
+      }
+      if (isValidElement<{ children?: ReactNode }>(child)) {
+        if (child.type === "br") return child;
+        return cloneElement(child, {
+          children: renderText(child.props.children),
+        });
+      }
+      return child;
+    });
+
+  return (
+    <span ref={ref} className={className}>
       <span className="sr-only">{textContent(children)}</span>
       <span aria-hidden="true">{renderText(children)}</span>
     </span>
@@ -610,18 +719,20 @@ export function CountUp({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const prefersReducedMotion = useReducedMotion();
+  const decimals = Number.isInteger(to) ? 0 : 1;
+  const fmt = (v: number) =>
+    `${prefix}${decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString("en-IN")}${suffix}`;
   useEffect(() => {
     if (!inView || !ref.current) return;
     if (prefersReducedMotion) {
-      ref.current.textContent = `${prefix}${to.toLocaleString("en-IN")}${suffix}`;
+      ref.current.textContent = fmt(to);
       return;
     }
     const controls = animate(0, to, {
       duration,
       ease: [0.16, 1, 0.3, 1],
       onUpdate: (v) => {
-        if (ref.current)
-          ref.current.textContent = `${prefix}${Math.round(v).toLocaleString("en-IN")}${suffix}`;
+        if (ref.current) ref.current.textContent = fmt(v);
       },
     });
     return () => controls.stop();

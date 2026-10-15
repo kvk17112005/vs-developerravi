@@ -8,6 +8,7 @@ import {
   inputCls,
   Magnetic,
   Reveal,
+  ScrollText,
   TextReveal,
   TrustBadges,
   usePageTitle,
@@ -20,7 +21,7 @@ const CARDS = [
     icon: "mapPin",
     title: "Head Office",
     lines: [CONTACT.address],
-    href: undefined,
+    href: CONTACT.mapUrl,
     action: "Get directions",
   },
   {
@@ -41,7 +42,7 @@ const CARDS = [
     icon: "clock",
     title: "Visiting Hours",
     lines: [CONTACT.hours, "Sundays by appointment"],
-    href: undefined,
+    href: CONTACT.whatsapp("I'd like to plan a visit. Please let me know the preferred time."),
     action: "Plan a visit",
   },
 ];
@@ -90,10 +91,10 @@ export default function Contact() {
               </TextReveal>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-              <TextReveal>
+              <ScrollText>
                 Drop by our Bhattarahalli office for a coffee and a look at the original
                 approval papers — or just call. We answer on the second ring.
-              </TextReveal>
+              </ScrollText>
             </p>
           </motion.div>
           <motion.div
@@ -112,11 +113,11 @@ export default function Contact() {
         <div className="mx-auto grid max-w-7xl gap-6 px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
           {CARDS.map((c, i) => (
             <Reveal key={c.title} delay={i * 0.08}>
-              <div className="flex h-full flex-col rounded-[1.75rem] border border-forest-600/10 bg-mint-50 p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-forest-600/25 hover:shadow-[0_24px_50px_-28px_rgba(23,86,49,0.35)]">
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-600 text-white">
+              <div className="hover-card flex h-full flex-col rounded-[1.75rem] border border-forest-600/10 bg-mint-50 p-7 hover:border-forest-600/25 hover:shadow-[0_24px_50px_-28px_rgba(23,86,49,0.35)]">
+                <span className="hover-icon flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-600 text-white">
                   <Icon name={c.icon} className="h-6 w-6" />
                 </span>
-                <h3 className="mt-4 font-display text-xl font-semibold text-forest-900">
+                <h3 className="hover-title mt-4 font-display text-xl font-semibold text-forest-900">
                   {c.title}
                 </h3>
                 {c.lines.map((l) => (
@@ -127,7 +128,7 @@ export default function Contact() {
                 {c.href ? (
                   <a
                     href={c.href}
-                    className="mt-auto pt-5 text-xs font-bold uppercase tracking-[0.16em] text-gold-600 transition hover:text-gold-700"
+                    className="hover-arrow mt-auto pt-5 text-xs font-bold uppercase tracking-[0.16em] text-gold-600 transition hover:text-gold-700"
                   >
                     {c.action} →
                   </a>
@@ -148,7 +149,7 @@ export default function Contact() {
           <Reveal>
             <form
               onSubmit={submit}
-              className="rounded-[2rem] border border-forest-600/10 bg-white p-7 card-shadow sm:p-9"
+              className="rounded-4xl border border-forest-600/10 bg-white p-7 card-shadow sm:p-9"
             >
               <h2 className="font-display text-3xl font-semibold text-forest-900">
                 Send a message
@@ -211,7 +212,7 @@ export default function Contact() {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <div className="relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-forest-600/10 card-shadow">
+            <div className="relative flex h-full flex-col overflow-hidden rounded-4xl border border-forest-600/10 card-shadow">
               <a
                 href={CONTACT.mapUrl}
                 target="_blank"

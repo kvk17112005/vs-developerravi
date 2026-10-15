@@ -18,6 +18,7 @@ import {
   Magnetic,
   ParallaxImage,
   Reveal,
+  ScrollText,
   SectionHeading,
   TextReveal,
   TrustBadges,
@@ -126,7 +127,7 @@ export default function ProjectDetail() {
             </h1>
             <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-mint-200 sm:text-base">
               <Icon name="mapPin" className="h-4.5 w-4.5 text-gold-300" />
-              <TextReveal>{project.location}</TextReveal>
+              <ScrollText>{project.location}</ScrollText>
             </p>
           </motion.div>
         </div>
@@ -134,7 +135,7 @@ export default function ProjectDetail() {
 
       {/* ---------- facts bar ---------- */}
       <section className="relative z-10 -mt-10 px-5 sm:px-8">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 rounded-[1.75rem] border border-forest-600/10 bg-white p-6 card-shadow sm:grid-cols-5 sm:p-8">
+        <div className="hover-card mx-auto grid max-w-6xl grid-cols-2 gap-4 rounded-[1.75rem] border border-forest-600/10 bg-white p-6 card-shadow sm:grid-cols-5 sm:p-8">
           {[
             { v: project.areaAcres, suffix: "", label: "Acres" },
             { v: project.plotCount, suffix: "", label: "Plots" },
@@ -150,7 +151,7 @@ export default function ProjectDetail() {
               transition={{ delay: i * 0.08, duration: 0.6, ease: EASE }}
               className="text-center"
             >
-              <p className="font-display text-2xl font-semibold text-forest-700 sm:text-3xl">
+              <p className="hover-title font-display text-2xl font-semibold text-forest-700 sm:text-3xl">
                 {f.text ?? <CountUp to={f.v} suffix={f.suffix} />}
               </p>
               <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-forest-900/50">
@@ -178,7 +179,7 @@ export default function ProjectDetail() {
             </Reveal>
             <Reveal delay={0.12}>
               <p className="mt-6 leading-relaxed text-forest-900/70">
-                <TextReveal>{project.about}</TextReveal>
+                <ScrollText>{project.about}</ScrollText>
               </p>
             </Reveal>
             <Reveal delay={0.2} className="mt-8">
@@ -188,11 +189,11 @@ export default function ProjectDetail() {
           <div className="grid gap-4 sm:grid-cols-2">
             {project.highlights.map((h, i) => (
               <Reveal key={h} delay={i * 0.08}>
-                <div className="flex h-full items-start gap-3.5 rounded-2xl border border-forest-600/10 bg-mint-50 p-5 transition hover:border-forest-600/25 hover:bg-mint-100">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-forest-600 text-white">
+                <div className="hover-card flex h-full items-start gap-3.5 rounded-2xl border border-forest-600/10 bg-mint-50 p-5 hover:border-forest-600/25 hover:bg-mint-100 hover:shadow-lg">
+                  <span className="hover-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-forest-600 text-white">
                     <Icon name="check" className="h-4.5 w-4.5" strokeWidth={2.2} />
                   </span>
-                  <p className="text-sm font-semibold leading-relaxed text-forest-800">
+                  <p className="hover-title text-sm font-semibold leading-relaxed text-forest-800">
                     {h}
                   </p>
                 </div>
@@ -207,12 +208,13 @@ export default function ProjectDetail() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <SectionHeading
             eyebrow="Interactive Master Plan"
+            textEffect="scroll"
             title={
               <>
                 Walk the layout — <em className="text-forest-600">before you visit.</em>
               </>
             }
-            sub="Drag to rotate, hover any plot to see its size, and tap to enquire. Corner plots are shown in gold."
+            sub="Drag to rotate, hover any plot to see its size, and tap to enquire. This layout is fully handed over."
           />
           <Reveal className="mt-12">
             <Suspense fallback={<ViewportFallback />}>
@@ -231,6 +233,7 @@ export default function ProjectDetail() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <SectionHeading
             eyebrow="Amenities & Infrastructure"
+            textEffect="scroll"
             title={
               <>
                 Delivered, <em className="text-forest-600">not promised.</em>
@@ -240,14 +243,14 @@ export default function ProjectDetail() {
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {project.amenities.map((a, i) => (
               <Reveal key={a.label} delay={(i % 4) * 0.08}>
-                <div className="group h-full rounded-[1.5rem] border border-forest-600/10 bg-white p-6 transition-all duration-500 hover:-translate-y-1.5 hover:border-forest-600/25 hover:shadow-[0_24px_50px_-28px_rgba(23,86,49,0.35)]">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition group-hover:bg-forest-600 group-hover:text-white">
+                <div className="hover-card group h-full rounded-[1.5rem] border border-forest-600/10 bg-white p-6 hover:border-forest-600/25 hover:shadow-[0_24px_50px_-28px_rgba(23,86,49,0.35)]">
+                  <span className="hover-icon flex h-12 w-12 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition group-hover:bg-forest-600 group-hover:text-white">
                     <Icon name={a.icon} className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-4 font-display text-lg font-semibold text-forest-900">
+                  <h3 className="hover-title mt-4 font-display text-lg font-semibold text-forest-900">
                     {a.label}
                   </h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-forest-900/60">
+                  <p className="hover-desc mt-1.5 text-[13px] leading-relaxed text-forest-900/60">
                     {a.desc}
                   </p>
                 </div>
@@ -269,8 +272,9 @@ export default function ProjectDetail() {
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-                In the middle of
-                <em className="text-forest-600"> everything.</em>
+                <ScrollText>
+                  In the middle of<em className="text-forest-600"> everything.</em>
+                </ScrollText>
               </h2>
               {project.address && (
                 <address className="mt-4 not-italic text-sm font-medium text-forest-800/70">
@@ -281,11 +285,11 @@ export default function ProjectDetail() {
             <div className="mt-8 space-y-4">
               {project.locationAdvantages.map((l, i) => (
                 <Reveal key={l} delay={i * 0.08}>
-                  <div className="flex items-center gap-4 rounded-2xl border border-forest-600/10 bg-white p-4.5">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint-100 text-forest-600">
+                  <div className="hover-card flex items-center gap-4 rounded-2xl border border-forest-600/10 bg-white p-4.5 hover:border-forest-600/25 hover:shadow-lg">
+                    <span className="hover-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint-100 text-forest-600">
                       <Icon name="mapPin" className="h-5 w-5" />
                     </span>
-                    <p className="text-sm font-semibold text-forest-800">{l}</p>
+                    <p className="hover-title text-sm font-semibold text-forest-800">{l}</p>
                   </div>
                 </Reveal>
               ))}
@@ -332,6 +336,7 @@ export default function ProjectDetail() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <SectionHeading
             eyebrow="Gallery"
+            textEffect="scroll"
             title={
               <>
                 {project.shortName} in <em className="text-forest-600">pictures.</em>
@@ -391,15 +396,19 @@ export default function ProjectDetail() {
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl">
-                This layout is filling up{" "}
-                <em className="text-mint-300">quickly.</em>
+                <ScrollText>
+                  This layout is filling up{" "}
+                  <em className="text-mint-300">quickly.</em>
+                </ScrollText>
               </h2>
             </Reveal>
             <Reveal delay={0.12}>
               <p className="mt-5 max-w-md leading-relaxed text-white/70">
-                {project.plotCount} plots. {project.areaAcres} acres. Prices on
-                request — because every plot deserves a real conversation, not a
-                hoarding.
+                <ScrollText>
+                  {project.plotCount} plots. {project.areaAcres} acres. Prices on
+                  request — because every plot deserves a real conversation, not a
+                  hoarding.
+                </ScrollText>
               </p>
             </Reveal>
             <Reveal delay={0.2} className="mt-8 flex flex-wrap gap-3">

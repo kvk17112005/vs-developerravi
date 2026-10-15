@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CONTACT } from "../data/site";
 import { cn } from "../utils/cn";
@@ -274,7 +274,7 @@ export default function HotstarProjectSpotlight() {
 
                       {/* Thumbnail Title Overlay */}
                       <div className="absolute inset-x-0 bottom-0 p-1.5 sm:p-2">
-                        <p className="line-clamp-1 font-display text-[10px] font-bold text-white drop-shadow sm:text-[11px]">
+                        <p className="line-clamp-1 font-display text-[10px] font-bold text-white drop-shadow transition-colors duration-300 group-hover:text-gold-300 sm:text-[11px]">
                           {item.title}
                         </p>
                       </div>

@@ -21,7 +21,6 @@ import {
   CinematicSection,
   EASE,
   Field,
-  GoldRule,
   Icon,
   inputCls,
   Magnetic,
@@ -30,9 +29,7 @@ import {
   Scroll3D,
   SectionHeading,
   TextReveal,
-  TiltCard,
   TrustBadges,
-  useIsDesktop,
   usePageTitle,
 } from "../components/ui";
 
@@ -204,7 +201,7 @@ function AboutSnapshot() {
       <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-2">
         <Reveal className="relative">
           <Scroll3D intensity={10} className="relative">
-            <div className="relative overflow-hidden rounded-[2rem] card-shadow">
+            <div className="hover-card relative overflow-hidden rounded-[2rem] card-shadow">
               <img
                 src="https://images.pexels.com/photos/31737842/pexels-photo-31737842.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=1400&h=1000"
                 alt="A green villa inside a VS Developers layout"
@@ -377,7 +374,7 @@ function FeaturedProjects() {
               key={p.slug}
               className="w-[85vw] shrink-0 snap-start sm:w-[380px] md:w-[420px]"
             >
-              <div className="group relative flex h-full flex-col overflow-hidden rounded-[2rem] bg-forest-800 card-shadow transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl">
+              <div className="group hover-card relative flex h-full flex-col overflow-hidden rounded-[2rem] bg-forest-800 card-shadow hover:shadow-2xl">
                 <div className="relative h-[320px] w-full overflow-hidden sm:h-[360px]">
                   <img
                     src={p.heroImage}
@@ -396,7 +393,7 @@ function FeaturedProjects() {
                     <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-mint-300">
                       {p.location}
                     </p>
-                    <h3 className="mt-1 font-display text-2xl font-semibold text-white sm:text-3xl">
+                    <h3 className="mt-1 font-display text-2xl font-semibold text-white transition-colors duration-500 group-hover:text-gold-300 sm:text-3xl">
                       {p.name}
                     </h3>
                   </div>
@@ -424,7 +421,7 @@ function FeaturedProjects() {
 
           {/* Compare All Three End Card */}
           <div className="w-[85vw] shrink-0 snap-start sm:w-[320px]">
-            <div className="flex h-full min-h-[380px] flex-col items-center justify-center rounded-[2rem] border border-gold-500/20 bg-[#faf6ee] p-8 text-center card-shadow">
+            <div className="hover-card flex h-full min-h-[380px] flex-col items-center justify-center rounded-[2rem] border border-gold-500/20 bg-[#faf6ee] p-8 text-center card-shadow">
               <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-forest-900/5 text-forest-800">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
                   <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -433,7 +430,7 @@ function FeaturedProjects() {
                   <rect x="3" y="14" width="7" height="7" rx="1" />
                 </svg>
               </span>
-              <h3 className="mt-5 font-display text-2xl font-semibold leading-snug text-forest-900">
+              <h3 className="hover-title mt-5 font-display text-2xl font-semibold leading-snug text-forest-900">
                 Compare all three,
                 <br />
                 side by side.
@@ -473,14 +470,14 @@ function Services() {
           {SERVICES.map((s, i) => (
             <Reveal key={s.title} delay={(i % 3) * 0.1}>
               <Scroll3D intensity={6} scaleEffect={false} className="h-full">
-                <div className="group h-full rounded-[1.75rem] border border-forest-600/10 bg-white p-7 transition-all duration-500 hover:-translate-y-2 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition-colors duration-500 group-hover:bg-forest-600 group-hover:text-white">
+                <div className="hover-card group h-full rounded-[1.75rem] border border-forest-600/10 bg-white p-7 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
+                  <div className="hover-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition-colors duration-500 group-hover:bg-forest-600 group-hover:text-white">
                     <Icon name={s.icon} className="h-7 w-7" />
                   </div>
-                  <h3 className="mt-5 font-display text-xl font-semibold text-forest-900">
+                  <h3 className="hover-title mt-5 font-display text-xl font-semibold text-forest-900">
                     {s.title}
                   </h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-forest-900/60">{s.desc}</p>
+                  <p className="hover-desc mt-2.5 text-sm leading-relaxed text-forest-900/60">{s.desc}</p>
                   <span className="mt-5 block h-[2px] w-8 rounded-full bg-gold-500 transition-all duration-500 group-hover:w-16" />
                 </div>
               </Scroll3D>
@@ -822,7 +819,7 @@ function Locations() {
             <Reveal key={p.slug} delay={i * 0.12}>
               <Link
                 to={`/projects/${p.slug}`}
-                className="group block h-full rounded-[1.75rem] border border-forest-600/10 bg-mint-50 p-7 transition-all duration-500 hover:-translate-y-2 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]"
+                className="group hover-card block h-full rounded-[1.75rem] border border-forest-600/10 bg-mint-50 p-7 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]"
               >
                 <div className="flex items-center justify-between">
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-600 text-white">
@@ -832,11 +829,11 @@ function Locations() {
                     {p.status}
                   </span>
                 </div>
-                <h3 className="mt-5 font-display text-2xl font-semibold text-forest-900">
+                <h3 className="hover-title mt-5 font-display text-2xl font-semibold text-forest-900">
                   {p.name}
                 </h3>
                 <p className="mt-1.5 text-sm font-semibold text-forest-600">{p.location}</p>
-                <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-forest-900/60">
+                <p className="hover-desc mt-3 line-clamp-2 text-sm leading-relaxed text-forest-900/60">
                   {p.locationAdvantages[0]} · {p.locationAdvantages[1]}
                 </p>
                 <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-forest-600">

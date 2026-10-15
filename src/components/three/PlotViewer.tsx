@@ -629,13 +629,13 @@ function Scene({
 
 /* ---------------- main exported viewer component ------------------- */
 
-const FILTERS: { key: "all" | PlotStatus; label: string }[] = [
-  { key: "all", label: "All Units" },
-  { key: "available", label: "Available Plots" },
-  { key: "corner", label: "Corner Plots" },
-  { key: "reserved", label: "Reserved" },
-  { key: "sold", label: "Constructed Villas" },
-];
+// const FILTERS: { key: "all" | PlotStatus; label: string }[] = [
+//   { key: "all", label: "All Units" },
+//   { key: "available", label: "Available Plots" },
+//   { key: "corner", label: "Corner Plots" },
+//   { key: "reserved", label: "Reserved" },
+//   { key: "sold", label: "Constructed Villas" },
+// ];
 
 export default function PlotViewer({
   plots,
@@ -647,7 +647,7 @@ export default function PlotViewer({
   name: string;
 }) {
   const [selected, setSelected] = useState<PlotCell | null>(null);
-  const [filter, setFilter] = useState<"all" | PlotStatus>("all");
+  const [filter] = useState<"all" | PlotStatus>("all");
 
   const shown = useMemo(
     () => (filter === "all" ? plots : plots.filter((p) => p.status === filter)),
@@ -708,10 +708,16 @@ export default function PlotViewer({
                     </p>
                   </div>
                   <p className="mt-1.5 font-display text-xl font-semibold text-forest-900">
-                    {selected.sqft.toLocaleString("en-IN")} sq.ft · Constructed Villa (Sold)
+                    {selected.sqft.toLocaleString("en-IN")} sq.ft · {STATUS_LABEL[selected.status]}
                   </p>
                   <p className="mt-1 text-xs text-forest-900/65 leading-relaxed">
-                    Custom villa constructed and handed over to proud owner. 100% of this layout is delivered. Register now for VIP early access to our next upcoming launch.
+                    {selected.status === "sold"
+                      ? "Custom villa constructed and handed over to proud owner. 100% of this layout is delivered. Register now for VIP early access to our next upcoming launch."
+                      : selected.status === "corner"
+                        ? "Premium corner plot with dual road frontage and enhanced vaastu flexibility. Final availability is confirmed on request."
+                        : selected.status === "reserved"
+                          ? "Currently reserved for an existing customer while paperwork completes. Ask us about similar openings."
+                          : "A vaastu-compliant plot, levelled and surveyor-marked, ready for registration and construction."}
                   </p>
                 </div>
                 <button

@@ -7,6 +7,7 @@ import {
   Magnetic,
   ParallaxImage,
   Reveal,
+  ScrollText,
   TextReveal,
   WhatsAppGlyph,
   usePageTitle,
@@ -59,9 +60,9 @@ export default function Projects() {
               </TextReveal>
             </h1>
             <p className="mt-5 text-base leading-relaxed text-forest-900/70 sm:text-lg">
-              <TextReveal>
+              <ScrollText>
                 Every VS layout is DTCP approved & DC converted before it reaches this page. Explore each — then come walk the land.
-              </TextReveal>
+              </ScrollText>
             </p>
           </motion.div>
         </div>
@@ -71,7 +72,7 @@ export default function Projects() {
       <section className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 space-y-24 sm:space-y-32">
           {PROJECTS.map((p, idx) => {
-            const isEven = idx % 2 === 1;
+            const reverseLayout = idx % 2 === 1;
 
             // Badges matching the demo screenshots
             const badges = [
@@ -82,17 +83,19 @@ export default function Projects() {
               "DC Converted",
             ];
 
-            const statusBadgeText = "100% SOLD OUT";
-            const statusBadgeColor = "bg-[#1f6b3d] text-white";
+            const isSoldOut =
+              p.status === "Sold Out" || p.status === "100% Sold Out" || p.status === "Completed";
+            const statusBadgeText = isSoldOut ? "100% SOLD OUT" : p.status.toUpperCase();
+            const statusBadgeColor = isSoldOut ? "bg-[#1f6b3d] text-white" : "bg-gold-500 text-forest-950";
 
             return (
               <Reveal key={p.slug} delay={idx * 0.12} y={36}>
-                <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <div className="group/card grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
                   {/* Image Column */}
                   <div
                     className={cn(
-                      "relative overflow-hidden rounded-[2rem] shadow-xl group",
-                      isEven && "lg:order-2"
+                      "relative overflow-hidden rounded-[2rem] shadow-xl transition-transform duration-500 group-hover/card:-translate-y-1.5 group",
+                      reverseLayout && "lg:order-2"
                     )}
                   >
                     <ParallaxImage
@@ -106,7 +109,7 @@ export default function Projects() {
                   </div>
 
                   {/* Details Column */}
-                  <div className={cn(isEven && "lg:order-1")}>
+                  <div className={cn(reverseLayout && "lg:order-1")}>
                     {/* Status Pill */}
                     <div className="flex items-center gap-2">
                       <span
@@ -121,7 +124,7 @@ export default function Projects() {
                     </div>
 
                     {/* Title & Location */}
-                    <h2 className="mt-4 font-display text-4xl font-semibold text-forest-950 sm:text-5xl">
+                    <h2 className="mt-4 font-display text-4xl font-semibold text-forest-950 transition-colors duration-500 group-hover/card:text-forest-600 sm:text-5xl">
                       <TextReveal mode="character">{p.name}</TextReveal>
                     </h2>
                     <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-forest-700">
@@ -134,7 +137,7 @@ export default function Projects() {
                       {badges.map((b) => (
                         <span
                           key={b}
-                          className="rounded-full bg-mint-100/90 border border-forest-600/15 px-3.5 py-1.5 text-xs font-bold text-forest-800"
+                          className="rounded-full bg-mint-100/90 border border-forest-600/15 px-3.5 py-1.5 text-xs font-bold text-forest-800 transition-colors duration-500 group-hover/card:border-forest-600/40 group-hover/card:bg-mint-200/90"
                         >
                           {b}
                         </span>
@@ -153,7 +156,7 @@ export default function Projects() {
                           to={`/projects/${p.slug}`}
                           className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2e7d4f] px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-forest-700/25 transition-all hover:bg-[#23633e] hover:-translate-y-0.5 cursor-pointer"
                         >
-                          Explore Layout <Icon name="arrowR" className="h-4 w-4" />
+                          Explore Layout <Icon name="arrowR" className="h-4 w-4 transition-transform duration-500 group-hover/card:translate-x-1" />
                         </Link>
                       </Magnetic>
 
@@ -202,7 +205,7 @@ export default function Projects() {
       <section className="py-20 sm:py-28 bg-white">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <Reveal>
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-[#175631] p-10 text-center text-white shadow-2xl sm:p-16">
+            <div className="hover-card relative overflow-hidden rounded-[2.5rem] bg-[#175631] p-10 text-center text-white shadow-2xl sm:p-16">
               <div className="paper-grain absolute inset-0 opacity-20" />
               <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-forest-500/20 blur-3xl" />
               <div className="absolute -bottom-20 -right-20 h-64 w-64 rounded-full bg-gold-500/20 blur-3xl" />

@@ -5,25 +5,27 @@ import {
   Icon,
   Lightbox,
   ParallaxImage,
+  ScrollText,
   TextReveal,
   usePageTitle,
 } from "../components/ui";
 import { PROJECTS, type GalleryItem } from "../data/site";
 import { cn } from "../utils/cn";
 
-const px = (id: number, w = 1200, h = 800) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${h}`;
+// const px = (id: number, w = 1200, h = 800) =>
+//   `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=${w}&h=${h}`;
 
-const EXTRA: GalleryItem[] = [
-  { src: px(31228856), caption: "Summer avenue — VS Rosemeadows", type: "photo" },
-  { src: px(37635080), caption: "Park greenery at VS Heritage", type: "photo" },
-  { src: px(12041474), caption: "Tree cover along Plot Row 4", type: "photo" },
-  { src: px(7174115), caption: "Owner-built garden pathway", type: "360" },
-  { src: px(29926504), caption: "The neighbourhood from above", type: "360" },
-  { src: px(7061659), caption: "A completed villa, VS Yogitha", type: "photo" },
-  { src: px(7580648), caption: "Our documentation desk at work", type: "photo" },
-  { src: px(7581119), caption: "Title verification session", type: "photo" },
-];
+
+// const EXTRA: GalleryItem[] = [
+//   { src: px(31228856), caption: "Summer avenue - VS Rosemeadows", type: "photo" },
+//   { src: px(37635080), caption: "Park greenery at VS Heritage", type: "photo" },
+//   { src: px(12041474), caption: "Tree cover along Plot Row 4", type: "photo" },
+//   { src: px(7174115), caption: "Owner-built garden pathway", type: "360" },
+//   { src: px(29926504), caption: "The neighbourhood from above", type: "360" },
+//   { src: px(7061659), caption: "A completed villa, VS Yogitha", type: "photo" },
+//   { src: px(7580648), caption: "Our documentation desk at work", type: "photo" },
+//   { src: px(7581119), caption: "Title verification session", type: "photo" },
+// ];
 
 const VIDEOS: GalleryItem[] = PROJECTS.map((p) => ({
   src: p.heroImage,
@@ -84,10 +86,10 @@ export default function Gallery() {
               </TextReveal>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-              <TextReveal>
+              <ScrollText>
                 Aerial surveys, owner-built villas, avenue trees and drone flyovers —
                 the VS portfolio as it stands today.
-              </TextReveal>
+              </ScrollText>
             </p>
           </motion.div>
         </div>
@@ -145,7 +147,7 @@ export default function Gallery() {
                         }
                       }}
                       className={cn(
-                        "group relative block w-full overflow-hidden rounded-2xl card-shadow",
+                        "group hover-card relative block w-full overflow-hidden rounded-2xl card-shadow",
                         ratio,
                       )}
                     >

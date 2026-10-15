@@ -7,6 +7,7 @@ import {
   Icon,
   inputCls,
   Reveal,
+  ScrollText,
   SectionHeading,
   TextReveal,
   usePageTitle,
@@ -68,11 +69,11 @@ export default function Careers() {
               </TextReveal>
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-              <TextReveal>
+              <ScrollText>
                 We're a small, senior team that treats every layout like a family
                 project. If you care about land, documents and people — in that order —
                 write to us.
-              </TextReveal>
+              </ScrollText>
             </p>
           </motion.div>
         </div>
@@ -99,6 +100,7 @@ export default function Careers() {
             <div>
               <SectionHeading
                 center={false}
+                textEffect="scroll"
                 eyebrow="Life at VS"
                 title={
                   <>
@@ -109,12 +111,12 @@ export default function Careers() {
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
                 {CULTURE.map((c, i) => (
                   <Reveal key={c.title} delay={i * 0.07}>
-                    <div className="h-full rounded-2xl border border-forest-600/10 bg-mint-50 p-5">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-forest-600 text-white">
+                    <div className="hover-card h-full rounded-2xl border border-forest-600/10 bg-mint-50 p-5 hover:border-forest-600/25 hover:shadow-lg">
+                      <span className="hover-icon flex h-10 w-10 items-center justify-center rounded-xl bg-forest-600 text-white">
                         <Icon name={c.icon} className="h-5 w-5" />
                       </span>
-                      <p className="mt-3 text-sm font-bold text-forest-900">{c.title}</p>
-                      <p className="mt-1 text-xs leading-relaxed text-forest-900/60">
+                      <p className="hover-title mt-3 text-sm font-bold text-forest-900">{c.title}</p>
+                      <p className="hover-desc mt-1 text-xs leading-relaxed text-forest-900/60">
                         {c.desc}
                       </p>
                     </div>
@@ -132,6 +134,7 @@ export default function Careers() {
           <div>
             <SectionHeading
               center={false}
+              textEffect="scroll"
               eyebrow="Open Roles"
               title={
                 <>
@@ -142,13 +145,13 @@ export default function Careers() {
             <div className="mt-9 space-y-4">
               {ROLES.map((r, i) => (
                 <Reveal key={r.title} delay={i * 0.05}>
-                  <div className="overflow-hidden rounded-2xl border border-forest-600/10 bg-white">
+                  <div className="hover-card overflow-hidden rounded-2xl border border-forest-600/10 bg-white hover:border-forest-600/25 hover:shadow-lg">
                     <button
                       onClick={() => setOpenRole(openRole === i ? null : i)}
                       className="flex w-full items-center justify-between gap-4 p-5 text-left"
                     >
                       <div>
-                        <h3 className="font-display text-lg font-semibold text-forest-900">
+                        <h3 className="hover-title font-display text-lg font-semibold text-forest-900">
                           {r.title}
                         </h3>
                         <p className="mt-1 text-xs font-semibold text-forest-600">

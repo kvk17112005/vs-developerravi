@@ -18,9 +18,9 @@ const COMPARISON_DATA: ComparisonRow[] = [
   {
     category: "Overview",
     feature: "Micro-Market Location",
-    heritage: "Old Madras Road, Bhattarahalli",
-    rosemeadows: "Budigere Cross (Airport Arc)",
-    yogitha: "Seegehalli, Whitefield Tech Hub",
+    heritage: "Kalkere, Bengaluru East",
+    rosemeadows: "Vemagal-Kurugal, Sulibele Road",
+    yogitha: "Budigere, Old Madras Road",
   },
   {
     category: "Overview",
@@ -76,16 +76,16 @@ const COMPARISON_DATA: ComparisonRow[] = [
   {
     category: "Connectivity",
     feature: "Nearest Metro Station",
-    heritage: "12 mins (Purple Line Metro)",
-    rosemeadows: "2 km (Upcoming Budigere Metro)",
-    yogitha: "5 mins (Hope Farm / Whitefield)",
+    heritage: "Kalkere Road (Purple Line) - 12 mins",
+    rosemeadows: "Budigere Cross (Upcoming) - 2 km",
+    yogitha: "KR Puram railway & metro hub - 15 mins",
     highlight: true,
   },
   {
     category: "Connectivity",
     feature: "Airport / IT Hub Access",
-    heritage: "20 mins to Whitefield ITPL",
-    rosemeadows: "25 mins to Kempegowda Airport",
+    heritage: "15 mins to Manyata Tech Park",
+    rosemeadows: "35 mins to Kempegowda Airport via SH-104",
     yogitha: "10 mins to ITPL & EPIP Tech Park",
   },
   {
@@ -105,7 +105,7 @@ const COMPARISON_DATA: ComparisonRow[] = [
   },
 ];
 
-const CATEGORIES = ["All", "Overview", "Approvals", "Connectivity", "Lifestyle"] as const;
+const CATEGORIES = ["All", "Overview", "Approvals", "Infrastructure", "Connectivity", "Lifestyle"] as const;
 
 export default function ProjectComparison({ className }: { className?: string }) {
   const [activeCategory, setActiveCategory] = useState<(typeof CATEGORIES)[number]>("All");

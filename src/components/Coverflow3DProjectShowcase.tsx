@@ -185,8 +185,8 @@ export default function Coverflow3DProjectShowcase() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedCard) return;
-      if (e.key === "ArrowLeft") handlePrev();
-      if (e.key === "ArrowRight") handleNext();
+      if (e.key === "ArrowLeft") { e.preventDefault(); handlePrev(); }
+      if (e.key === "ArrowRight") { e.preventDefault(); handleNext(); }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -222,8 +222,8 @@ export default function Coverflow3DProjectShowcase() {
             {COVERFLOW_ITEMS.map((item, idx) => {
               const offset = idx - activeIndex;
               const isActive = idx === activeIndex;
-              const isPrev = offset === -1 || (activeIndex === 0 && idx === COVERFLOW_ITEMS.length - 1);
-              const isNext = offset === 1 || (activeIndex === COVERFLOW_ITEMS.length - 1 && idx === 0);
+              // const isPrev = offset === -1 || (activeIndex === 0 && idx === COVERFLOW_ITEMS.length - 1);
+              // const isNext = offset === 1 || (activeIndex === COVERFLOW_ITEMS.length - 1 && idx === 0);
 
               // Calculate 3D transformation values
               let xTranslate = 0;
@@ -290,7 +290,7 @@ export default function Coverflow3DProjectShowcase() {
                   transition={{ duration: 0.55, ease: EASE }}
                   style={{ zIndex }}
                   className={cn(
-                    "absolute h-[380px] w-[260px] cursor-pointer select-none rounded-[2rem] p-1.5 shadow-2xl transition-shadow duration-300 sm:h-[440px] sm:w-[300px]",
+                    "group absolute h-[380px] w-[260px] cursor-pointer select-none rounded-[2rem] p-1.5 shadow-2xl transition-shadow duration-300 sm:h-[440px] sm:w-[300px]",
                     isActive
                       ? "ring-4 ring-gold-400/90 shadow-forest-950/40"
                       : "hover:opacity-100",
@@ -322,7 +322,7 @@ export default function Coverflow3DProjectShowcase() {
                       <p className="text-[10px] font-bold uppercase tracking-wider text-gold-400 drop-shadow">
                         {item.category}
                       </p>
-                      <h3 className="mt-1 font-display text-lg font-bold leading-snug text-white drop-shadow-md sm:text-xl">
+                      <h3 className="mt-1 font-display text-lg font-bold leading-snug text-white drop-shadow-md transition-colors duration-500 group-hover:text-gold-300 sm:text-xl">
                         {item.title}
                       </h3>
                       <p className="mt-1.5 line-clamp-2 text-xs text-white/80">

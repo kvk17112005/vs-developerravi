@@ -6,6 +6,7 @@ import {
   Icon,
   Magnetic,
   Reveal,
+  ScrollText,
   SectionHeading,
   TextReveal,
   TrustBadges,
@@ -25,7 +26,7 @@ const TIMELINE = [
   {
     year: "2017",
     title: "VS Heritage breaks ground",
-    desc: "Our flagship 5-acre layout on Old Madras Road begins. Avenue trees are planted before the first plot is sold.",
+    desc: "Our flagship 12.5-acre layout at Kalkere, Bengaluru East begins. Avenue trees are planted before the first plot is sold.",
   },
   {
     year: "2019",
@@ -85,7 +86,7 @@ function PageHero({ eyebrow, title, sub }: { eyebrow: string; title: React.React
             <TextReveal mode="character">{title}</TextReveal>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
-            <TextReveal>{sub}</TextReveal>
+            <ScrollText>{sub}</ScrollText>
           </p>
         </motion.div>
       </div>
@@ -121,26 +122,32 @@ export default function About() {
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-                Approvals first.
-                <br />
-                Marketing <em className="text-forest-600">never.</em>
+                <ScrollText>
+                  Approvals first.
+                  <br />
+                  Marketing <em className="text-forest-600">never.</em>
+                </ScrollText>
               </h2>
             </Reveal>
             <Reveal delay={0.12}>
               <p className="mt-6 leading-relaxed text-forest-900/70">
-                Most developers sell a dream and chase papers later. We do it backwards.
-                Before a single VS plot is offered, the land is DC converted, the layout
-                is DTCP approved, and the titles have passed our legal desk
-                twice. It takes longer. It costs more. And it's why banks smile at our
-                buyers.
+                <ScrollText>
+                  Most developers sell a dream and chase papers later. We do it
+                  backwards. Before a single VS plot is offered, the land is DC
+                  converted, the layout is DTCP approved, and the titles have passed our
+                  legal desk twice. It takes longer. It costs more. And it's why banks
+                  smile at our buyers.
+                </ScrollText>
               </p>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="mt-4 leading-relaxed text-forest-900/70">
-                We build modestly too — no marble lobbies, no celebrity hoardings. Our
-                budget goes into 40-foot roads, avenue trees, underground drainage and
-                honest paperwork. The result: layouts that feel like neighbourhoods the
-                day the fences come down.
+                <ScrollText>
+                  We build modestly too — no marble lobbies, no celebrity hoardings. Our
+                  budget goes into 40-foot roads, avenue trees, underground drainage and
+                  honest paperwork. The result: layouts that feel like neighbourhoods the
+                  day the fences come down.
+                </ScrollText>
               </p>
             </Reveal>
             <Reveal delay={0.28} className="mt-8">
@@ -178,6 +185,7 @@ export default function About() {
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <SectionHeading
             eyebrow="The Journey"
+            textEffect="scroll"
             title={
               <>
                 Ten years, <em className="text-forest-600">tree by tree.</em>
@@ -211,14 +219,14 @@ export default function About() {
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-forest-600" />
                   </span>
-                  <div className="rounded-[1.5rem] border border-forest-600/10 bg-white p-6 transition hover:border-forest-600/25 hover:shadow-lg">
-                    <span className="font-display text-3xl font-semibold text-forest-600">
+                  <div className="hover-card rounded-[1.5rem] border border-forest-600/10 bg-white p-6 hover:border-forest-600/25 hover:shadow-lg">
+                    <span className="hover-title font-display text-3xl font-semibold text-forest-600">
                       {t.year}
                     </span>
-                    <h3 className="mt-1.5 font-display text-xl font-semibold text-forest-900">
+                    <h3 className="hover-title mt-1.5 font-display text-xl font-semibold text-forest-900">
                       {t.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-forest-900/60">
+                    <p className="hover-desc mt-2 text-sm leading-relaxed text-forest-900/60">
                       {t.desc}
                     </p>
                   </div>
@@ -234,6 +242,7 @@ export default function About() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <SectionHeading
             eyebrow="Our Values"
+            textEffect="scroll"
             title={
               <>
                 Three words we <em className="text-forest-600">work by.</em>
@@ -243,14 +252,14 @@ export default function About() {
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {VALUES.map((v, i) => (
               <Reveal key={v.title} delay={i * 0.12}>
-                <div className="h-full rounded-[1.75rem] border border-forest-600/10 bg-mint-50 p-8 text-center transition-all duration-500 hover:-translate-y-2 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
-                  <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-forest-600 text-white">
+                <div className="hover-card h-full rounded-[1.75rem] border border-forest-600/10 bg-mint-50 p-8 text-center hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
+                  <span className="hover-icon mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-forest-600 text-white">
                     <Icon name={v.icon} className="h-8 w-8" />
                   </span>
-                  <h3 className="mt-5 font-display text-2xl font-semibold text-forest-900">
+                  <h3 className="hover-title mt-5 font-display text-2xl font-semibold text-forest-900">
                     {v.title}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-forest-900/60">{v.desc}</p>
+                  <p className="hover-desc mt-3 text-sm leading-relaxed text-forest-900/60">{v.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -258,7 +267,7 @@ export default function About() {
 
           {/* leadership note */}
           <Reveal delay={0.1} className="mt-20">
-            <div className="relative overflow-hidden rounded-[2rem] bg-forest-800 px-8 py-12 text-white sm:px-14">
+            <div className="hover-card relative overflow-hidden rounded-[2rem] bg-forest-800 px-8 py-12 text-white sm:px-14">
               <div className="paper-grain absolute inset-0 opacity-30" />
               <span className="absolute right-8 top-6 font-display text-7xl text-white/10 select-none">
                 "
@@ -287,6 +296,7 @@ export default function About() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <SectionHeading
             eyebrow="Certifications & Approvals"
+            textEffect="scroll"
             title={
               <>
                 Papers you can <em className="text-forest-600">frame.</em>
@@ -297,13 +307,13 @@ export default function About() {
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
             {TRUST_BADGES.map((b, i) => (
               <Reveal key={b} delay={i * 0.08}>
-                <div className="group h-full rounded-[1.5rem] border border-forest-600/10 bg-white p-6 text-center transition-all duration-500 hover:-translate-y-1.5 hover:border-gold-500/50 hover:shadow-lg">
-                  <span className="relative mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mint-100 text-forest-600 transition group-hover:bg-forest-600 group-hover:text-white">
+                <div className="hover-card group h-full rounded-[1.5rem] border border-forest-600/10 bg-white p-6 text-center hover:border-gold-500/50 hover:shadow-lg">
+                  <span className="hover-icon relative mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-mint-100 text-forest-600 transition group-hover:bg-forest-600 group-hover:text-white">
                     <span className="animate-spin-slow absolute inset-0 rounded-full border border-dashed border-gold-500/60" />
                     <Icon name="seal" className="h-7 w-7" />
                   </span>
-                  <p className="mt-4 text-sm font-bold text-forest-900">{b}</p>
-                  <p className="mt-1.5 text-[11px] leading-relaxed text-forest-900/50">
+                  <p className="hover-title mt-4 text-sm font-bold text-forest-900">{b}</p>
+                  <p className="hover-desc mt-1.5 text-[11px] leading-relaxed text-forest-900/50">
                     Verified & available for inspection
                   </p>
                 </div>

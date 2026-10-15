@@ -85,6 +85,87 @@ body {
   transform: scale(1.035);
 }
 
+/* ---------- card hover + text interactions ---------- */
+
+.hover-card {
+  transition:
+    transform 550ms var(--ease-lux),
+    box-shadow 550ms var(--ease-lux),
+    border-color 400ms ease,
+    background-color 400ms ease;
+  will-change: transform;
+}
+
+.hover-card:hover {
+  transform: translateY(-8px);
+}
+
+.hover-card .hover-title {
+  transition:
+    color 450ms var(--ease-lux),
+    letter-spacing 450ms var(--ease-lux);
+}
+
+.hover-card:hover .hover-title {
+  color: var(--color-forest-600);
+  letter-spacing: 0.01em;
+}
+
+.hover-card .hover-desc {
+  transition: color 450ms var(--ease-lux);
+}
+
+.hover-card:hover .hover-desc {
+  color: color-mix(in srgb, var(--color-forest-900) 80%, transparent);
+}
+
+.hover-card .hover-arrow {
+  transition: transform 450ms var(--ease-lux);
+}
+
+.hover-card:hover .hover-arrow {
+  transform: translateX(6px);
+}
+
+.hover-card .hover-icon {
+  transition:
+    transform 450ms var(--ease-lux),
+    background-color 450ms var(--ease-lux),
+    color 450ms var(--ease-lux);
+}
+
+.hover-card:hover .hover-icon {
+  transform: translateY(-2px) scale(1.06);
+}
+
+.hover-card .hover-underline {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 500ms var(--ease-lux);
+}
+
+.hover-card:hover .hover-underline {
+  transform: scaleX(1);
+}
+
+.hover-card .hover-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 450ms var(--ease-lux),
+    transform 450ms var(--ease-lux);
+}
+
+.hover-card:hover .hover-reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-word {
+  display: inline-block;
+  will-change: opacity, transform, filter;
+}
+
 a,
 button {
   -webkit-tap-highlight-color: transparent;
@@ -200,5 +281,19 @@ a:active {
 
   .animate-marquee {
     animation: none !important;
+  }
+
+  .hover-card,
+  .hover-card .hover-title,
+  .hover-card .hover-desc,
+  .hover-card .hover-arrow,
+  .hover-card .hover-icon,
+  .hover-card .hover-underline,
+  .hover-card .hover-reveal {
+    transition: none !important;
+  }
+
+  .hover-card:hover {
+    transform: none !important;
   }
 }
