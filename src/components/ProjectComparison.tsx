@@ -18,9 +18,9 @@ const COMPARISON_DATA: ComparisonRow[] = [
   {
     category: "Overview",
     feature: "Micro-Market Location",
-    heritage: "Kalkere, Bengaluru East",
-    rosemeadows: "Vemagal-Kurugal, Sulibele Road",
-    yogitha: "Budigere, Old Madras Road",
+    heritage: "Vemagal-Kurugal, Karnataka",
+    rosemeadows: "Vemagal-Kurugal, Karnataka",
+    yogitha: "Vemagal Hosahalli",
   },
   {
     category: "Overview",
@@ -74,21 +74,6 @@ const COMPARISON_DATA: ComparisonRow[] = [
     yogitha: "Underground UGD, Water & Power",
   },
   {
-    category: "Connectivity",
-    feature: "Nearest Metro Station",
-    heritage: "Kalkere Road (Purple Line) - 12 mins",
-    rosemeadows: "Budigere Cross (Upcoming) - 2 km",
-    yogitha: "KR Puram railway & metro hub - 15 mins",
-    highlight: true,
-  },
-  {
-    category: "Connectivity",
-    feature: "Airport / IT Hub Access",
-    heritage: "15 mins to Manyata Tech Park",
-    rosemeadows: "35 mins to Kempegowda Airport via SH-104",
-    yogitha: "10 mins to ITPL & EPIP Tech Park",
-  },
-  {
     category: "Lifestyle",
     feature: "Signature Amenity",
     heritage: "Avenue Shade Trees & Central Park",
@@ -105,7 +90,7 @@ const COMPARISON_DATA: ComparisonRow[] = [
   },
 ];
 
-const CATEGORIES = ["All", "Overview", "Approvals", "Infrastructure", "Connectivity", "Lifestyle"] as const;
+const CATEGORIES = ["All", "Overview", "Approvals", "Infrastructure", "Lifestyle"] as const;
 
 export default function ProjectComparison({ className }: { className?: string }) {
   const [activeCategory, setActiveCategory] = useState<(typeof CATEGORIES)[number]>("All");
@@ -163,10 +148,7 @@ export default function ProjectComparison({ className }: { className?: string })
             {PROJECTS.map((p) => (
               <div key={p.slug} className="flex flex-col justify-between px-4">
                 <div>
-                  <span className="inline-block rounded-full bg-gold-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">
-                    {p.status}
-                  </span>
-                  <h3 className="mt-2 font-display text-2xl font-semibold text-forest-900">
+                  <h3 className="mt-0 font-display text-2xl font-semibold text-forest-900">
                     {p.name}
                   </h3>
                   <p className="mt-1 text-xs font-medium text-forest-600">
@@ -281,10 +263,7 @@ export default function ProjectComparison({ className }: { className?: string })
               <div className="mt-6 overflow-hidden rounded-[2rem] border border-forest-600/15 bg-white p-6 shadow-xl">
                 <div className="flex items-start justify-between">
                   <div>
-                    <span className="rounded-full bg-gold-500/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">
-                      {cur.status}
-                    </span>
-                    <h3 className="mt-2 font-display text-2xl font-semibold text-forest-900">
+                    <h3 className="font-display text-2xl font-semibold text-forest-900">
                       {cur.name}
                     </h3>
                     <p className="mt-0.5 text-xs font-medium text-forest-600">

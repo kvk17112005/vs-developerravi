@@ -21,7 +21,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "../utils/cn";
-import { TRUST_BADGES } from "../data/site";
+import { SITE, TRUST_BADGES } from "../data/site";
 
 export const EASE = [0.22, 1, 0.36, 1] as const;
 export const EASE_LUX = [0.65, 0, 0.35, 1] as const;
@@ -254,10 +254,54 @@ export function WhatsAppGlyph({ className = "h-6 w-6" }: { className?: string })
 
 /* ------------------------------ hooks ------------------------------- */
 
-export function usePageTitle(title: string) {
+function setHeadMeta(attr: "name" | "property", key: string, content: string) {
+  let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
+  if (!el) {
+    el = document.createElement("meta");
+    el.setAttribute(attr, key);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("content", content);
+}
+
+function setHeadLink(rel: string, href: string) {
+  let el = document.head.querySelector<HTMLLinkElement>(`link[rel="${rel}"]`);
+  if (!el) {
+    el = document.createElement("link");
+    el.setAttribute("rel", rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute("href", href);
+}
+
+/** Keeps crawler-facing metadata in sync as the HashRouter navigates:
+    document title, meta description, canonical, Open Graph and Twitter cards. */
+export function usePageMeta(title: string, description?: string) {
+  const [hash, setHash] = useState(() => window.location.hash);
+
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
   useEffect(() => {
     document.title = title;
-  }, [title]);
+
+    const path = hash.replace(/^#/, "");
+    const url = path && path !== "/" ? `${SITE.url}/#${path}` : `${SITE.url}/`;
+
+    setHeadLink("canonical", url);
+    setHeadMeta("property", "og:title", title);
+    setHeadMeta("property", "og:url", url);
+    setHeadMeta("name", "twitter:title", title);
+
+    if (description) {
+      setHeadMeta("name", "description", description);
+      setHeadMeta("property", "og:description", description);
+      setHeadMeta("name", "twitter:description", description);
+    }
+  }, [title, description, hash]);
 }
 
 export function useIsDesktop() {
@@ -270,6 +314,18 @@ export function useIsDesktop() {
     return () => mq.removeEventListener("change", fn);
   }, []);
   return is;
+}
+
+/** True once the page is scrolled past `threshold` px. Passive listener, cleaned up. */
+export function useScrolled(threshold = 40) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return scrolled;
 }
 
 /* ------------------------------ primitives -------------------------- */
@@ -316,6 +372,62 @@ export function Reveal({
       }}
       viewport={{ once, margin: "-70px" }}
       transition={{ duration: 0.85, delay, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* Shared grid stagger — wrap a grid in <StaggerGroup> and each card in
+   <StaggerItem> so they fade/rise in sequence when the group enters view. */
+
+export function StaggerGroup({
+  children,
+  className,
+  stagger = 0.09,
+  delay = 0,
+  once = true,
+}: {
+  children: ReactNode;
+  className?: string;
+  stagger?: number;
+  delay?: number;
+  once?: boolean;
+}) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once, margin: "-70px" }}
+      variants={{
+        hidden: {},
+        show: { transition: { staggerChildren: reduced ? 0 : stagger, delayChildren: delay } },
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+export function StaggerItem({
+  children,
+  className,
+  y = 26,
+}: {
+  children: ReactNode;
+  className?: string;
+  y?: number;
+}) {
+  const reduced = useReducedMotion();
+  return (
+    <motion.div
+      className={className}
+      variants={{
+        hidden: reduced ? { opacity: 1 } : { opacity: 0, y },
+        show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+      }}
     >
       {children}
     </motion.div>
@@ -399,7 +511,8 @@ export function TextReveal({
             if (!part || /^\s+$/.test(part)) return part;
 
             if (mode === "character") {
-              return Array.from(part).map((character) => {
+              const startIndex = revealIndex;
+              const characters = Array.from(part).map((character) => {
                 const index = revealIndex++;
                 return (
                   <motion.span
@@ -425,6 +538,14 @@ export function TextReveal({
                   </motion.span>
                 );
               });
+              return (
+                <span
+                  key={`word-${startIndex}`}
+                  className="inline-block whitespace-nowrap"
+                >
+                  {characters}
+                </span>
+              );
             }
 
             const index = revealIndex++;
@@ -619,6 +740,60 @@ export function ParallaxImage({
   );
 }
 
+/* Masked image reveal with optional hover zoom — for plain <img> blocks.
+   The reveal (clip + scale) animates on an inner wrapper so the CSS hover
+   zoom on the <img> itself is never overridden by framer's inline transform. */
+
+export function ImageReveal({
+  src,
+  alt,
+  className,
+  imgClassName,
+  loading = "lazy",
+  decoding = "async",
+  zoom = true,
+  delay = 0,
+  once = true,
+  objectPosition,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  imgClassName?: string;
+  loading?: "eager" | "lazy";
+  decoding?: "async" | "auto" | "sync";
+  zoom?: boolean;
+  delay?: number;
+  once?: boolean;
+  objectPosition?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once, margin: "-80px" });
+  const reduced = useReducedMotion();
+
+  return (
+    <div ref={ref} className={cn("media-frame", zoom && "media-zoom", className)}>
+      <motion.div
+        className="h-full w-full"
+        initial={reduced ? false : { clipPath: "inset(0 0 100% 0)", scale: 1.08 }}
+        animate={
+          reduced || inView ? { clipPath: "inset(0 0 0% 0)", scale: 1 } : undefined
+        }
+        transition={{ duration: 0.9, delay, ease: EASE }}
+      >
+        <img
+          src={src}
+          alt={alt}
+          loading={loading}
+          decoding={decoding}
+          style={objectPosition ? { objectPosition } : undefined}
+          className={cn("h-full w-full object-cover", imgClassName)}
+        />
+      </motion.div>
+    </div>
+  );
+}
+
 export function GoldRule({ className }: { className?: string }) {
   return (
     <div className={cn("flex items-center justify-center gap-3", className)}>
@@ -788,7 +963,7 @@ export function Cta({
   type?: "submit" | "button";
 }) {
   const base =
-    "group inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold tracking-wide transition-all duration-300 cursor-pointer";
+    "group inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-7 py-3.5 text-sm font-bold tracking-wide transition-all duration-300 cursor-pointer";
   const styles: Record<string, string> = {
     solid:
       "bg-forest-600 text-white shadow-lg shadow-forest-600/25 hover:bg-forest-700 hover:-translate-y-0.5",

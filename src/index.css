@@ -265,6 +265,70 @@ a:active {
   transform-style: preserve-3d;
 }
 
+/* ---------- animated link underline ---------- */
+
+.link-underline {
+  position: relative;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1.5px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: currentColor;
+  transition: transform 450ms var(--ease-lux);
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Hover/focus underline that doesn't use a pseudo-element (so it never
+   clashes with the active-route ::after underline in the navbar). */
+
+.nav-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1.5px;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  transition:
+    background-size 450ms var(--ease-lux),
+    color 200ms ease;
+}
+
+.nav-underline:hover,
+.nav-underline:focus-visible {
+  background-size: 100% 1.5px;
+}
+
+/* ---------- image reveal + hover zoom ---------- */
+
+.media-frame {
+  position: relative;
+  overflow: hidden;
+}
+
+.media-frame img,
+.media-zoom img {
+  transition: transform 900ms var(--ease-lux);
+  will-change: transform;
+}
+
+.media-frame:hover img,
+.media-zoom:hover img {
+  transform: scale(1.06);
+}
+
+.will-transform {
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -295,5 +359,25 @@ a:active {
 
   .hover-card:hover {
     transform: none !important;
+  }
+
+  .media-frame img,
+  .media-zoom img,
+  .media-frame:hover img,
+  .media-zoom:hover img {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .link-underline::after {
+    transition: none !important;
+  }
+
+  .nav-underline {
+    transition: color 200ms ease;
+  }
+
+  .will-transform {
+    will-change: auto;
   }
 }

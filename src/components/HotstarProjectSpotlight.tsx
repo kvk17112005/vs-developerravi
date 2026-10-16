@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { CONTACT } from "../data/site";
 import { cn } from "../utils/cn";
-import { EASE, Icon, WhatsAppGlyph } from "./ui";
+import { EASE, Icon, TextReveal, WhatsAppGlyph } from "./ui";
 
 /* ------------------------------------------------------------------ */
 /*  JioHotstar-Exact Fullscreen Project Hero Carousel (Transparent)   */
@@ -27,48 +27,48 @@ export interface SpotlightItem {
 const SPOTLIGHT_ITEMS: SpotlightItem[] = [
   {
     id: "rosemeadows",
-    title: "VS ROSEMEADOWS",
-    topBadge: "#1 in Hoskote Corridor · 100% Sold Out",
+    title: "VS ROSE MEADOWS",
+    topBadge: "#1 in Vemagal-Kurugal",
     yearMeta: "2024 · 4.7 Acres · 71 Plots · DC / DTCP Approved",
     genres: ["Villa Plots", "DC Converted", "DTCP Approved", "Flowering Avenues"],
     description:
-      "4.7 acres of flowering avenues on the Sulibele growth corridor — signature rose-and-tabebuia landscaping, 40-ft wide boulevards, central landscaped park, and complete underground utility lines delivered.",
+      "4.7 acres of flowering avenues in Vemagal-Kurugal — signature rose-and-tabebuia landscaping, 40-ft wide boulevards, central landscaped park, and complete underground utility lines delivered.",
     tags: ["4.7 Acres Extent", "71 Villa Plots", "40-Ft Avenues", "Central Park", "Loan Ready"],
     backdrop: "/projects/rose/rose-1.jpg",
     thumbnail: "/projects/rose/rose-1.jpg",
     link: "/projects/vs-rosemeadows",
-    location: "Sulibele Road, Hoskote",
+    location: "Vemagal-Kurugal, Karnataka",
     highlights: "Starts at 30×40 ft · Complete UGD & Power Delivered",
   },
   {
     id: "heritage",
     title: "VS HERITAGE",
-    topBadge: "#1 in Kalkere · 100% Delivered & Occupied",
-    yearMeta: "2021 · 12.5 Acres · 148 Plots · Hennur Corridor",
+    topBadge: "#1 in Vemagal-Kurugal · 100% Delivered & Occupied",
+    yearMeta: "2021 · 12.5 Acres · 148 Plots",
     genres: ["Township Masterplan", "Half-Acre Park", "40-Ft Boulevards", "Gated Security"],
     description:
-      "Twelve and a half acres of approval-perfect plotted calm in Kalkere. Wide 40-ft avenues, a half-acre lush green central park with 800m jogging track, and 148 vaastu-friendly plots minutes from Hennur Road.",
+      "Twelve and a half acres of approval-perfect plotted calm in Vemagal-Kurugal. Wide 40-ft avenues, a half-acre lush green central park with 800m jogging track, and 148 vaastu-friendly plots.",
     tags: ["12.5 Acres Layout", "148 Plots Delivered", "Half-Acre Park", "Dual Water Lines", "Clear Titles"],
     backdrop: "/projects/heritage/heritage-1.jpg",
     thumbnail: "/projects/heritage/heritage-1.jpg",
     link: "/projects/vs-heritage",
-    location: "Kalkere, Bengaluru East",
-    highlights: "30×50 & 40×60 ft · 15 Mins from Manyata Tech Park",
+    location: "Vemagal-Kurugal, Karnataka",
+    highlights: "30×50 & 40×60 ft",
   },
   {
     id: "yogitha",
-    title: "VS YOGITHA",
-    topBadge: "#1 at Budigere Cross · 100% Sold Out",
-    yearMeta: "2023 · 6.8 Acres · 76 Plots · NH-75 Highway",
-    genres: ["Boutique Community", "Hill & Lake View", "NH-75 Connectivity", "Underground UGD"],
+    title: "VS YOGITHA GARDEN",
+    topBadge: "#1 at Vemagal Hosahalli",
+    yearMeta: "2023 · 6.8 Acres · 76 Plots",
+    genres: ["Boutique Community", "Hill & Lake View", "Underground UGD"],
     description:
-      "Boutique gated layout at Budigere against a stunning natural hill-and-lake backdrop — 76 premium plots, dual road frontage, children's play park, and just 20 minutes from ITPL Whitefield.",
-    tags: ["6.8 Acres Extent", "76 Plots", "Hill & Lake Vista", "20 Mins to ITPL", "DC Converted"],
+      "Boutique gated layout in Vemagal Hosahalli against a stunning natural hill-and-lake backdrop — 76 premium plots, dual road frontage, children's play park.",
+    tags: ["6.8 Acres Extent", "76 Plots", "Hill & Lake Vista", "DC Converted"],
     backdrop: "/projects/yogitha/yogitha-1.jpg",
     thumbnail: "/projects/yogitha/yogitha-1.jpg",
     link: "/projects/vs-yogitha",
-    location: "Budigere, Old Madras Road",
-    highlights: "30×40 & 30×50 ft · 5 Mins from Budigere Cross",
+    location: "Vemagal Hosahalli",
+    highlights: "30×40 & 30×50 ft",
   },
 ];
 
@@ -155,7 +155,7 @@ export default function HotstarProjectSpotlight() {
 
                   {/* 2. Big Cinematic Title Heading */}
                   <h2 className="mt-2.5 font-display text-3xl font-black uppercase tracking-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] sm:text-5xl lg:text-6xl">
-                    {current.title}
+                    <TextReveal>{current.title}</TextReveal>
                   </h2>
 
                   {/* 3. Year & Specs Meta Line */}

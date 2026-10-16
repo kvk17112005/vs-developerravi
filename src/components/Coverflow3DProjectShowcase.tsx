@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { CONTACT } from "../data/site";
 import { cn } from "../utils/cn";
-import { EASE, Icon, WhatsAppGlyph } from "./ui";
+import { EASE, Icon, TextReveal, WhatsAppGlyph } from "./ui";
 
 /* ------------------------------------------------------------------ */
 /*  Luxury 3D Perspective Coverflow & Master Plan Inspector           */
@@ -33,11 +33,11 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
     category: "Architecture & Planning",
     badge: "Master Layout",
     image: "/projects/rose/rose-1.jpg",
-    location: "Sulibele Road, Hoskote",
+    location: "Vemagal-Kurugal, Karnataka",
     shortDesc: "Complete architectural visualization of 4.7 acres with 71 luxury villa plots, flowering avenues and central parks.",
     modalDetails: {
       headline: "Master Plan Visualization",
-      subheadline: "VS Rosemeadows · 4.7 Acres Plotted Development",
+      subheadline: "VS Rose Meadows · 4.7 Acres Plotted Development",
       description:
         "Every VS Developers master plan is drafted with precision town planning guidelines — wide 40-ft and 30-ft asphalt avenues, underground utilities, rainwater percolation pits, and dedicated green central parks.",
       specs: [
@@ -45,7 +45,7 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
         { label: "Plot Count", value: "71 Villa Plots" },
         { label: "Plot Sizes", value: "Starts at 30×40 ft" },
         { label: "Approvals", value: "DC Converted & DTCP Approved" },
-        { label: "Handover Status", value: "100% Sold Out & Delivered" },
+        { label: "Handover Status", value: "Delivered" },
       ],
       amenityPills: ["40-Ft Avenues", "Underground Drainage", "Ducted Power", "Jogging Track", "24×7 Security"],
       galleryImages: [
@@ -61,7 +61,7 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
     category: "Landscape & Ecology",
     badge: "Eco Living",
     image: "/projects/heritage/heritage-7.jpg",
-    location: "Kalkere, Bengaluru East",
+    location: "Vemagal-Kurugal, Karnataka",
     shortDesc: "Half-acre landscaped central park with curated walking loops, children play equipment, and shaded gazebos.",
     modalDetails: {
       headline: "Lush Green Parks & Walking Tracks",
@@ -89,21 +89,16 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
     category: "Strategic Location",
     badge: "Investment",
     image: "/projects/yogitha/yogitha-1.jpg",
-    location: "Budigere Cross, NH-75",
+    location: "Vemagal Hosahalli",
     shortDesc: "Strategically located along rapidly growing industrial and IT corridors with direct highway connectivity.",
     modalDetails: {
-      headline: "Strategic Bengaluru East Corridors",
-      subheadline: "VS Yogitha · Budigere / Old Madras Road",
-      description:
-        "Positioned for substantial long-term capital appreciation — 5 minutes from Budigere Cross junction, 20 minutes from ITPL Whitefield, and 35 minutes from Kempegowda International Airport.",
+      headline: "Strategic Vemagal Corridors",
+      subheadline: "VS Yogitha Garden · Vemagal Hosahalli",
+      description: "Positioned for substantial long-term capital appreciation.",
       specs: [
-        { label: "Highway Access", value: "NH-75 & Old Madras Road" },
-        { label: "Whitefield (ITPL)", value: "20 Minutes" },
-        { label: "KR Puram Hub", value: "15 Minutes" },
-        { label: "Airport Distance", value: "35 Minutes via STRR" },
         { label: "Legal Status", value: "Clear Titles & DC Converted" },
       ],
-      amenityPills: ["Fastest Growing Corridor", "STRR Proximity", "Metro Connectivity", "Commercial Hubs", "Top Schools"],
+      amenityPills: ["Fastest Growing Corridor", "Commercial Hubs", "Top Schools"],
       galleryImages: [
         "/projects/yogitha/yogitha-1.jpg",
         "/projects/yogitha/yogitha-2.jpg",
@@ -145,7 +140,7 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
     category: "Premium Sites",
     badge: "Dual Aspect",
     image: "/projects/rose/rose-4.jpg",
-    location: "VS Rosemeadows & Heritage",
+    location: "Vemagal-Kurugal, Karnataka",
     shortDesc: "Vaastu-aligned dual road access corner plots with maximum natural ventilation and custom villa architecture potential.",
     modalDetails: {
       headline: "Dual-Aspect Corner Villa Sites",
@@ -156,7 +151,7 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
         { label: "Frontage", value: "Dual Road Frontage (40' + 30')" },
         { label: "Vaastu Alignment", value: "100% East & North Facing" },
         { label: "Plot Dimensions", value: "30×50 ft & 40×60 ft" },
-        { label: "Plot Status", value: "100% Sold Out & Handed Over" },
+        { label: "Plot Status", value: "Handed Over" },
         { label: "Loan Availability", value: "Pre-approved by Leading Banks" },
       ],
       amenityPills: ["Double Road Access", "Vaastu Compliant", "Corner Landscaping", "Immediate Registration", "Clear Titles"],
@@ -208,11 +203,15 @@ export default function Coverflow3DProjectShowcase() {
           </div>
 
           <h2 className="mt-4 font-display text-3xl font-semibold leading-[1.12] tracking-tight text-forest-900 sm:text-5xl">
-            Selected and popular aspects in the{" "}
-            <em className="text-forest-700">development right now</em>
+            <TextReveal>
+              Selected and popular aspects in the{" "}
+              <em className="text-forest-700">development right now</em>
+            </TextReveal>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-forest-900/65 sm:text-base">
-            Click any perspective card to inspect full architectural blueprints, infrastructure details, and master plan highlights.
+            <TextReveal>
+              Click any perspective card to inspect full architectural blueprints, infrastructure details, and master plan highlights.
+            </TextReveal>
           </p>
         </div>
 

@@ -11,7 +11,7 @@ import {
   ScrollText,
   TextReveal,
   TrustBadges,
-  usePageTitle,
+  usePageMeta,
   WhatsAppGlyph,
 } from "../components/ui";
 import { CONTACT } from "../data/site";
@@ -48,7 +48,10 @@ const CARDS = [
 ];
 
 export default function Contact() {
-  usePageTitle("Contact Us | VS Developers | Bhattarahalli, Bengaluru");
+  usePageMeta(
+    "Contact Us | VS Developers | Bhattarahalli, Bengaluru",
+    "Visit the VS Developers office at Bhattarahalli, Bengaluru or call +91 9035585849 to book a site visit to our plotted developments at Vemagal.",
+  );
   const [form, setForm] = useState({
     name: "",
     phone: "",

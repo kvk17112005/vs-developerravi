@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { PROJECTS } from "../data/site";
 import { cn } from "../utils/cn";
-import { Cta, EASE, Icon, Magnetic } from "./ui";
+import { Cta, EASE, Icon, Magnetic, useScrolled } from "./ui";
 
 export function Logo({
   light,
@@ -42,21 +42,15 @@ export function Logo({
 }
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mega, setMega] = useState(false);
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   const isHome = pathname === "/";
+  const scrolled = useScrolled(40);
   const solid = scrolled || !isHome || open;
+  const compact = scrolled;
   const linkCls = solid ? "text-forest-800" : "text-white";
   const linkHover = solid ? "hover:text-forest-600" : "hover:text-mint-200";
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     setMega(false);
@@ -68,6 +62,7 @@ export default function Navbar() {
       "relative px-1 py-2 text-[13.5px] font-bold tracking-wide transition-colors",
       linkCls,
       linkHover,
+      !isActive && "nav-underline",
       isActive &&
         cn(
           "after:absolute after:-bottom-0.5 after:left-0 after:h-[2.5px] after:w-full after:rounded-full",
@@ -75,16 +70,26 @@ export default function Navbar() {
         ),
     );
 
+  const drawerItem = {
+    hidden: { opacity: 0, y: 14 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: EASE } },
+  };
+
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-[100] transition-all duration-500",
         solid
-          ? "border-b border-forest-600/10 bg-white/90 shadow-[0_10px_40px_-18px_rgba(23,86,49,0.25)] backdrop-blur-xl"
+          ? "border-b border-forest-600/10 bg-white/90 shadow-[0_10px_40px_-18px_rgba(23,86,49,0.25)] backdrop-blur-md"
           : "bg-gradient-to-b from-forest-900/45 to-transparent",
       )}
     >
-      <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between gap-4 px-5 sm:px-8">
+      <div
+        className={cn(
+          "mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 transition-[height] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] sm:px-8",
+          compact ? "h-[62px]" : "h-[76px]",
+        )}
+      >
         <Logo light={!solid} />
 
         <nav className="hidden items-center gap-7 lg:flex">
@@ -135,7 +140,7 @@ export default function Navbar() {
                             {p.location}
                           </p>
                           <p className="mt-1.5 text-[11px] font-bold text-gold-600">
-                            {p.status} · {p.sizes}
+                            {p.sizes}
                           </p>
                         </div>
                       </Link>
@@ -170,7 +175,7 @@ export default function Navbar() {
         <div className="hidden lg:block">
           <Magnetic strength={0.3}>
             <Cta to="/contact" variant="gold" className="px-6 py-2.5 text-[13px]">
-              Book Site Visit
+              Schedule a Visit
             </Cta>
           </Magnetic>
         </div>
@@ -191,11 +196,25 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.4, ease: EASE }}
-            className="overflow-hidden border-t border-forest-600/10 bg-white/95 backdrop-blur-xl lg:hidden"
+            key="drawer"
+            variants={{
+              hidden: { opacity: 0, height: 0 },
+              show: {
+                opacity: 1,
+                height: "auto",
+                transition: {
+                  duration: 0.4,
+                  ease: EASE,
+                  staggerChildren: 0.05,
+                  delayChildren: 0.06,
+                },
+              },
+              exit: { opacity: 0, height: 0, transition: { duration: 0.28, ease: EASE } },
+            }}
+            initial="hidden"
+            animate="show"
+            exit="exit"
+            className="overflow-hidden border-t border-forest-600/10 bg-white/95 backdrop-blur-md lg:hidden"
           >
             <div className="space-y-1 px-6 py-5">
               {[
@@ -206,15 +225,19 @@ export default function Navbar() {
                 { to: "/careers", label: "Careers" },
                 { to: "/contact", label: "Contact" },
               ].map((l) => (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  className="block rounded-xl px-3 py-3 font-display text-lg text-forest-800 transition hover:bg-mint-100"
-                >
-                  {l.label}
-                </Link>
+                <motion.div key={l.to} variants={drawerItem}>
+                  <Link
+                    to={l.to}
+                    className="block rounded-xl px-3 py-3 font-display text-lg text-forest-800 transition hover:bg-mint-100"
+                  >
+                    {l.label}
+                  </Link>
+                </motion.div>
               ))}
-              <div className="grid grid-cols-3 gap-2.5 pt-3">
+              <motion.div
+                variants={drawerItem}
+                className="grid grid-cols-3 gap-2.5 pt-3"
+              >
                 {PROJECTS.map((p) => (
                   <Link
                     key={p.slug}
@@ -232,10 +255,12 @@ export default function Navbar() {
                     </p>
                   </Link>
                 ))}
-              </div>
-              <Cta to="/contact" className="mt-4 w-full">
-                Book Site Visit
-              </Cta>
+              </motion.div>
+              <motion.div variants={drawerItem}>
+                <Cta to="/contact" className="mt-4 w-full">
+                  Schedule a Visit
+                </Cta>
+              </motion.div>
             </div>
           </motion.div>
         )}

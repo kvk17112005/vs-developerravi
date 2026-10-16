@@ -27,14 +27,19 @@ import {
   Parallax3DLayer,
   Reveal,
   Scroll3D,
+  ScrollText,
   SectionHeading,
+  StaggerGroup,
+  StaggerItem,
   TextReveal,
   TrustBadges,
-  usePageTitle,
+  usePageMeta,
 } from "../components/ui";
 
 function Hero() {
   const heroRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const heroVisible = useRef(true);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -52,10 +57,32 @@ function Hero() {
     });
   };
 
+  /* Pause the 4K hero video while it is scrolled out of view so its decode
+     loop stops competing with scroll animations; resume when it returns. */
+  useEffect(() => {
+    const node = heroRef.current;
+    const video = videoRef.current;
+    if (!node || !video || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        heroVisible.current = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          if (video.paused) keepPlaying(video);
+        } else if (!video.paused) {
+          video.pause();
+        }
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <section ref={heroRef} className="relative h-[100svh] min-h-[640px] overflow-hidden">
       <motion.div style={{ scale: videoScale, y: videoY }} className="absolute inset-0 h-full w-full">
         <video
+          ref={videoRef}
           className="h-full w-full object-cover"
           src={HERO_VIDEO}
           poster={HERO_POSTER}
@@ -63,7 +90,7 @@ function Hero() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           onCanPlay={(event) => keepPlaying(event.currentTarget)}
           onEnded={(event) => {
             const video = event.currentTarget;
@@ -72,7 +99,8 @@ function Hero() {
           }}
           onPause={(event) => {
             const video = event.currentTarget;
-            if (!video.ended && document.visibilityState === "visible") keepPlaying(video);
+            if (!video.ended && heroVisible.current && document.visibilityState === "visible")
+              keepPlaying(video);
           }}
         />
       </motion.div>
@@ -132,7 +160,7 @@ function Hero() {
           </Magnetic>
           <Magnetic>
             <Cta to="/contact" variant="outlineLight">
-              <Icon name="phone" className="h-4 w-4" /> Book a Site Visit
+              <Icon name="phone" className="h-4 w-4" /> Schedule a Site Visit
             </Cta>
           </Magnetic>
         </motion.div>
@@ -241,9 +269,11 @@ function AboutSnapshot() {
               </span>
             </div>
             <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-              We don't sell land.
-              <br />
-              We build <em className="text-forest-600">neighbourhoods.</em>
+              <ScrollText>
+                We don't sell land.
+                <br />
+                We build <em className="text-forest-600">neighbourhoods.</em>
+              </ScrollText>
             </h2>
           </Reveal>
           <Reveal delay={0.12}>
@@ -323,12 +353,16 @@ function FeaturedProjects() {
               </span>
             </div>
             <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-              Three layouts.
-              <br />
-              One standard of <em className="text-forest-600">trust.</em>
+              <TextReveal mode="character">
+                Three layouts.
+                <br />
+                One standard of <em className="text-forest-600">trust.</em>
+              </TextReveal>
             </h2>
             <p className="mt-4 max-w-xl text-base leading-relaxed text-forest-900/65">
-              Explore the VS portfolio — DC converted, DTCP approved, green, and ready to build on.
+              <TextReveal>
+                Explore the VS portfolio - DC converted, DTCP approved, green, and ready to build on.
+              </TextReveal>
             </p>
           </Reveal>
 
@@ -383,9 +417,6 @@ function FeaturedProjects() {
                     className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-forest-900/95 via-forest-900/30 to-transparent" />
-                  <span className="absolute left-5 top-5 rounded-full bg-gold-500 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-forest-900 shadow-md">
-                    {p.status}
-                  </span>
                   <span className="absolute right-5 top-5 rounded-full bg-forest-900/70 px-3.5 py-1.5 text-[10px] font-bold text-white shadow-sm">
                     0{i + 1}
                   </span>
@@ -466,11 +497,11 @@ function Services() {
           }
           sub="From the first title search to your first concrete pour — everything a plotted-development partner should do, done properly."
         />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((s, i) => (
-            <Reveal key={s.title} delay={(i % 3) * 0.1}>
-              <Scroll3D intensity={6} scaleEffect={false} className="h-full">
-                <div className="hover-card group h-full rounded-[1.75rem] border border-forest-600/10 bg-white p-7 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
+        <StaggerGroup className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.09} delay={0.1}>
+          {SERVICES.map((s) => (
+            <StaggerItem key={s.title} className="h-full">
+              <Scroll3D intensity={8} className="h-full">
+                <div className="hover-card group h-full rounded-[1.75rem] border border-forest-600/10 bg-white p-7 transition duration-500 hover:-translate-y-1.5 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
                   <div className="hover-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition-colors duration-500 group-hover:bg-forest-600 group-hover:text-white">
                     <Icon name={s.icon} className="h-7 w-7" />
                   </div>
@@ -481,9 +512,9 @@ function Services() {
                   <span className="mt-5 block h-[2px] w-8 rounded-full bg-gold-500 transition-all duration-500 group-hover:w-16" />
                 </div>
               </Scroll3D>
-            </Reveal>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </div>
     </section>
   );
@@ -502,18 +533,24 @@ function WhySection() {
 
       <div className="relative mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div className="flex flex-col justify-center">
-          <div className="flex items-center gap-3">
-            <span className="h-px w-9 bg-gold-400/80" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-gold-300">
-              The VS Standard
-            </span>
-          </div>
-          <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-6xl text-white">
-            Why VS <em className="text-mint-300 font-normal italic">Developers?</em>
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-white/70">
-            Six reasons families keep choosing our plotted communities across Bengaluru East.
-          </p>
+          <Reveal>
+            <div className="flex items-center gap-3">
+              <span className="h-px w-9 bg-gold-400/80" />
+              <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-gold-300">
+                The VS Standard
+              </span>
+            </div>
+            <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-6xl text-white">
+              <TextReveal mode="character">
+                Why VS <em className="text-mint-300 font-normal italic">Developers?</em>
+              </TextReveal>
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-white/70">
+              <TextReveal>
+                Six reasons families keep choosing our plotted communities across Bengaluru East.
+              </TextReveal>
+            </p>
+          </Reveal>
 
           <div className="mt-10 min-h-[180px]">
             <AnimatePresence mode="wait">
@@ -551,39 +588,44 @@ function WhySection() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:content-center">
+        <StaggerGroup
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:content-center"
+          stagger={0.08}
+          delay={0.15}
+        >
           {WHY_STEPS.map((s, i) => (
-            <button
-              key={s.title}
-              onClick={() => setActive(i)}
-              className={cn(
-                "flex flex-col items-start gap-3 rounded-3xl border p-6 text-left transition-all duration-300 cursor-pointer sm:p-7",
-                i === active
-                  ? "border-gold-400/60 bg-white text-forest-900 shadow-2xl scale-[1.02]"
-                  : "border-white/10 bg-white/5 text-white hover:bg-white/10 hover:border-white/20"
-              )}
-            >
-              <span
+            <StaggerItem key={s.title} className="h-full">
+              <button
+                onClick={() => setActive(i)}
                 className={cn(
-                  "flex h-12 w-12 items-center justify-center rounded-2xl transition-colors duration-300",
+                  "flex h-full w-full flex-col items-start gap-3 rounded-3xl border p-6 text-left transition-all duration-300 cursor-pointer sm:p-7",
                   i === active
-                    ? "bg-mint-100 text-forest-600"
-                    : "bg-white/10 text-mint-200"
+                    ? "border-gold-400/60 bg-white text-forest-900 shadow-2xl scale-[1.02]"
+                    : "border-white/10 bg-white/5 text-white hover:-translate-y-1 hover:bg-white/10 hover:border-white/20"
                 )}
               >
-                <Icon name={s.icon} className="h-6 w-6" />
-              </span>
-              <span
-                className={cn(
-                  "font-display text-base font-semibold leading-snug sm:text-lg",
-                  i === active ? "text-forest-900" : "text-white/85"
-                )}
-              >
-                {s.title}
-              </span>
-            </button>
+                <span
+                  className={cn(
+                    "flex h-12 w-12 items-center justify-center rounded-2xl transition-colors duration-300",
+                    i === active
+                      ? "bg-mint-100 text-forest-600"
+                      : "bg-white/10 text-mint-200"
+                  )}
+                >
+                  <Icon name={s.icon} className="h-6 w-6" />
+                </span>
+                <span
+                  className={cn(
+                    "font-display text-base font-semibold leading-snug sm:text-lg",
+                    i === active ? "text-forest-900" : "text-white/85"
+                  )}
+                >
+                  {s.title}
+                </span>
+              </button>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerGroup>
       </div>
     </section>
   );
@@ -694,11 +736,13 @@ function ScheduleVisit() {
               </span>
             </div>
             <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-              See the land.
-              <br />
-              Read the papers.
-              <br />
-              <em className="text-forest-600">Then decide.</em>
+              <TextReveal mode="character">
+                See the land.
+                <br />
+                Read the papers.
+                <br />
+                <em className="text-forest-600">Then decide.</em>
+              </TextReveal>
             </h2>
           </Reveal>
           <Reveal delay={0.15}>
@@ -786,7 +830,7 @@ function ScheduleVisit() {
                 </Cta>
                 <p className="text-center text-[11px] text-forest-900/45">
                   Or call us directly at{" "}
-                  <a href={CONTACT.phoneHref} className="font-bold text-forest-600">
+                  <a href={CONTACT.phoneHref} className="whitespace-nowrap font-bold text-forest-600">
                     {CONTACT.phone}
                   </a>
                 </p>
@@ -825,16 +869,13 @@ function Locations() {
                   <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest-600 text-white">
                     <Icon name="mapPin" className="h-6 w-6" />
                   </span>
-                  <span className="rounded-full bg-gold-500/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-gold-700">
-                    {p.status}
-                  </span>
                 </div>
                 <h3 className="hover-title mt-5 font-display text-2xl font-semibold text-forest-900">
                   {p.name}
                 </h3>
                 <p className="mt-1.5 text-sm font-semibold text-forest-600">{p.location}</p>
                 <p className="hover-desc mt-3 line-clamp-2 text-sm leading-relaxed text-forest-900/60">
-                  {p.locationAdvantages[0]} · {p.locationAdvantages[1]}
+                  {p.tagline}
                 </p>
                 <span className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-forest-600">
                   View Layout
@@ -860,7 +901,7 @@ function Locations() {
             </div>
             <Magnetic>
               <Cta href={CONTACT.whatsapp("Hello! I'd like to book a site visit.")} variant="gold">
-                <Icon name="phone" className="h-4 w-4" /> Book a Site Visit
+                <Icon name="phone" className="h-4 w-4" /> Schedule a Site Visit
               </Cta>
             </Magnetic>
           </div>
@@ -873,7 +914,10 @@ function Locations() {
 /* ------------------------------ page ------------------------------- */
 
 export default function Home() {
-  usePageTitle("VS Developers | Plotted Developments in Bengaluru | A Trusted Property Partner");
+  usePageMeta(
+    "VS Developers | Plotted Developments in Bengaluru | A Trusted Property Partner",
+    "DTCP approved & DC converted plots for sale in Bengaluru East. 1800+ plots delivered across 110+ acres since 2014 — VS Heritage, Rose Meadows & Yogitha Garden.",
+  );
   return (
     <>
       <CinematicSection first>

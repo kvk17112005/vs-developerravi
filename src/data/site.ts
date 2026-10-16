@@ -19,6 +19,15 @@ export const CONTACT = {
 
 export const TAGLINE = "A Trusted Property Partner.";
 
+/* Production origin — single source of truth for canonical tags, sitemaps,
+   robots.txt and llms.txt. Change here if the domain ever changes. */
+export const SITE = {
+  url: "https://vsdevelopersbengaluru.com",
+  name: "VS Developers",
+  logo: "/vs-logo-new.jpg",
+  ogImage: "/hero-poster.jpg",
+} as const;
+
 export const TRUST_BADGES = [
   "DTCP Approved",
   "DC Converted",
@@ -143,7 +152,6 @@ export interface Project {
   tagline: string;
   location: string;
   address?: string;
-  status: "Sold Out" | "100% Sold Out" | "Completed" | "Selling" | "New Launch" | "Limited Plots";
   areaAcres: number;
   plotCount: number;
   sizes: string;
@@ -166,9 +174,9 @@ export const PROJECTS: Project[] = [
     slug: "vs-heritage",
     name: "VS Heritage",
     shortName: "Heritage",
-    tagline: "Twelve and a half acres of DTCP approved & DC converted calm in Kalkere.",
-    location: "Kalkere, Bengaluru East",
-    status: "Sold Out",
+    tagline: "Twelve and a half acres of DTCP approved & DC converted calm in Vemagal-Kurugal.",
+    location: "Vemagal-Kurugal, Karnataka",
+    address: "Vemagal-Kurugal, Karnataka",
     areaAcres: 12.5,
     plotCount: 148,
     sizes: "30×50 & 40×60 ft",
@@ -178,12 +186,11 @@ export const PROJECTS: Project[] = [
     mapEmbed: "https://maps.google.com/maps?q=13.026526,77.709515&hl=en&z=16&output=embed",
     mapUrl: "https://maps.app.goo.gl/z5kCzu3gEZ34RUab9",
     about:
-      "Twelve and a half acres of DTCP approved & DC converted calm in Kalkere — wide 40-ft avenues, a half-acre park and 148 vaastu-friendly plots minutes from Hennur Road.",
+      "Twelve and a half acres of DTCP approved & DC converted calm in Vemagal-Kurugal — wide 40-ft avenues, a half-acre park and 148 vaastu-friendly plots.",
     highlights: [
-      "100% Sold Out & Fully Handed Over",
+      "Fully Handed Over",
       "Wide 40-ft avenues & half-acre park",
       "148 vaastu-friendly plots delivered",
-      "Minutes from Hennur Road",
     ],
     amenities: [
       { icon: "road", label: "Wide Asphalt Roads", desc: "40' wide avenues with kerb stones and drains." },
@@ -195,12 +202,7 @@ export const PROJECTS: Project[] = [
       { icon: "rain", label: "Rainwater Harvesting", desc: "Percolation pits across the layout." },
       { icon: "ruler", label: "Levelled & Marked Plots", desc: "Surveyor-verified boundaries, ready to build." },
     ],
-    locationAdvantages: [
-      "Hennur Road corridor — 5 minutes",
-      "Manyata Tech Park — 15 minutes",
-      "Kempegowda Airport road — 25 minutes",
-      "Kalkere Lake & walking promenade — 2 minutes",
-    ],
+    locationAdvantages: [],
     gallery: [
       { src: "/projects/heritage/heritage-1.jpg", caption: "Aerial view of VS Heritage layout", type: "photo" },
       { src: "/projects/heritage/heritage-2.jpg", caption: "Avenue roads & boundary demarcations", type: "photo" },
@@ -217,12 +219,11 @@ export const PROJECTS: Project[] = [
   },
   {
     slug: "vs-rosemeadows",
-    name: "VS Rosemeadows",
-    shortName: "Rosemeadows",
-    tagline: "4.7 acres of flowering avenues on the Sulibele growth corridor.",
-    location: "Vemagal–Kurugal, Karnataka",
-    address: "Vemagal–Kurugal, Karnataka 563157, India",
-    status: "Sold Out",
+    name: "VS Rose Meadows",
+    shortName: "Rose Meadows",
+    tagline: "4.7 acres of flowering avenues in Vemagal-Kurugal.",
+    location: "Vemagal-Kurugal, Karnataka",
+    address: "Vemagal-Kurugal, Karnataka",
     areaAcres: 4.7,
     plotCount: 71,
     sizes: "Starts at 30×40 ft",
@@ -233,12 +234,12 @@ export const PROJECTS: Project[] = [
     mapUrl: "https://maps.app.goo.gl/rF3kqMzLJAbEWFNV9",
     directionsUrl: "https://www.google.com/maps/dir/?api=1&destination=13.2210196%2C77.9708434",
     about:
-      "4.7 acres of flowering avenues on the Sulibele growth corridor — DC / DTCP approved, with a rose-and-tabebuia theme woven through the master plan.",
+      "4.7 acres of flowering avenues in Vemagal-Kurugal — DC / DTCP approved, with a rose-and-tabebuia theme woven through the master plan.",
     highlights: [
-      "100% Sold Out & Handed Over",
+      "Handed Over",
       "Rose-and-tabebuia flowering avenues",
       "71 premium villa plots across 4.7 acres",
-      "Plots starting at 30×40 ft on Sulibele Road",
+      "Plots starting at 30×40 ft",
     ],
     amenities: [
       { icon: "road", label: "Wide Asphalt Roads", desc: "30' & 40' roads with service lanes." },
@@ -250,15 +251,10 @@ export const PROJECTS: Project[] = [
       { icon: "rain", label: "Rainwater Harvesting", desc: "Percolation pits across the layout." },
       { icon: "ruler", label: "Levelled & Marked Plots", desc: "Surveyor-verified boundaries, ready to build." },
     ],
-    locationAdvantages: [
-      "Hoskote Industrial Hub — 8 minutes",
-      "STRR (Satellite Town Ring Road) — 5 minutes",
-      "Whitefield IT corridor — 25 minutes",
-      "Kempegowda Airport — 35 minutes via SH-104",
-    ],
+    locationAdvantages: [],
     gallery: [
-      { src: "/projects/rose/rose-1.jpg", caption: "Aerial overview of VS Rosemeadows", type: "photo" },
-      { src: "/projects/rose/rose-2.jpg", caption: "Flowering avenues along Sulibele road", type: "photo" },
+      { src: "/projects/rose/rose-1.jpg", caption: "Aerial overview of VS Rose Meadows", type: "photo" },
+      { src: "/projects/rose/rose-2.jpg", caption: "Flowering avenues within VS Rose Meadows", type: "photo" },
       { src: "/projects/rose/rose-3.jpg", caption: "Gated layout entrance & wide roads", type: "photo" },
       { src: "/projects/rose/rose-4.jpg", caption: "Curated green central park & walking track", type: "photo" },
       { src: "/projects/rose/rose-5.jpg", caption: "Underground storm water & drainage lines", type: "photo" },
@@ -268,17 +264,17 @@ export const PROJECTS: Project[] = [
       { src: "/projects/rose/rose-9.jpg", caption: "Street lighting and security infrastructure", type: "photo" },
       { src: "/projects/rose/rose-10.jpg", caption: "Corner villa plots with dual road access", type: "photo" },
       { src: "/projects/rose/rose-11.jpg", caption: "Landscape garden & jogging pathway", type: "photo" },
-      { src: "/projects/rose/rose-12.jpg", caption: "Surrounding Hoskote green corridor view", type: "360" },
+      { src: "/projects/rose/rose-12.jpg", caption: "Surrounding green corridor view", type: "360" },
     ],
     layout: makeLayout(23, 9, 8, [1200, 1500, 1800, 2400], { roadCol: 4, parks: 1 }),
   },
   {
     slug: "vs-yogitha",
-    name: "VS Yogitha",
-    shortName: "Yogitha",
-    tagline: "76 plots against a hill-and-lake backdrop, 20 mins from Whitefield.",
-    location: "Budigere, Old Madras Road",
-    status: "Sold Out",
+    name: "VS Yogitha Garden",
+    shortName: "Yogitha Garden",
+    tagline: "76 plots against a hill-and-lake backdrop in Vemagal Hosahalli.",
+    location: "Vemagal Hosahalli",
+    address: "Vemagal Hosahalli",
     areaAcres: 6.8,
     plotCount: 76,
     sizes: "30×40 & 30×50 ft",
@@ -288,11 +284,10 @@ export const PROJECTS: Project[] = [
     mapEmbed: "https://maps.google.com/maps?q=13.2328838,77.9737425&hl=en&z=16&output=embed",
     mapUrl: "https://www.google.com/maps?q=13.2328838,77.9737425",
     about:
-      "Our boutique development at Budigere — 76 plots against a hill-and-lake backdrop, 20 minutes from Whitefield on NH-75.",
+      "Our boutique development in Vemagal Hosahalli — 76 plots against a hill-and-lake backdrop.",
     highlights: [
-      "100% Sold Out & Delivered",
+      "Delivered",
       "Hill-and-lake natural panoramic backdrop",
-      "20 minutes from Whitefield on NH-75",
       "DC / DTCP Approved",
     ],
     amenities: [
@@ -305,16 +300,11 @@ export const PROJECTS: Project[] = [
       { icon: "rain", label: "Rainwater Harvesting", desc: "Percolation pits across the layout." },
       { icon: "ruler", label: "Levelled & Marked Plots", desc: "Surveyor-verified boundaries, ready to build." },
     ],
-    locationAdvantages: [
-      "Budigere Cross junction — 5 minutes",
-      "Whitefield (ITPL) — 20 minutes via NH-75",
-      "KR Puram railway & metro hub — 15 minutes",
-      "Upcoming Peripheral Ring Road — 3 km",
-    ],
+    locationAdvantages: [],
     gallery: [
       { src: "/projects/yogitha/yogitha-1.jpg", caption: "Boutique layout against hill & lake backdrop", type: "photo" },
       { src: "/projects/yogitha/yogitha-2.jpg", caption: "40-ft wide central avenue boulevard", type: "photo" },
-      { src: "/projects/yogitha/yogitha-3.jpg", caption: "Budigere Cross connectivity & entry gate", type: "photo" },
+      { src: "/projects/yogitha/yogitha-3.jpg", caption: "Layout entry gate & connectivity", type: "photo" },
       { src: "/projects/yogitha/yogitha-4.jpg", caption: "Levelled, vaastu-aligned plotted sites", type: "photo" },
       { src: "/projects/yogitha/yogitha-5.jpg", caption: "Underground utilities and ducted power", type: "photo" },
       { src: "/projects/yogitha/yogitha-6.jpg", caption: "Children play area & landscaped garden", type: "photo" },
@@ -343,14 +333,14 @@ export const TESTIMONIALS = [
     quote:
       "What won us over was the patience. No pushy sales — they walked us through every approval paper before we paid a rupee. That's rare in real estate.",
     name: "Priya & Sandeep Menon",
-    role: "VS Rosemeadows plot owners",
+    role: "VS Rose Meadows plot owners",
     initials: "PM",
   },
   {
     quote:
       "I flew in from Dubai twice. They handled the registration, the loan documentation, even the plot marking. Truly a trusted partner.",
     name: "Lakshmi Narayan",
-    role: "NRI buyer · VS Yogitha",
+    role: "NRI buyer · VS Yogitha Garden",
     initials: "LN",
   },
   {
@@ -377,12 +367,12 @@ export const ROLES = [
     type: "Full-time",
     location: "Bhattarahalli HQ, Bengaluru",
     exp: "4+ years in plotted/real estate sales",
-    desc: "Own the complete sales cycle for VS Heritage & VS Yogitha — site visits, documentation, closing.",
+    desc: "Own the complete sales cycle for VS Heritage & VS Yogitha Garden — site visits, documentation, closing.",
   },
   {
     title: "Site Engineer (Civil)",
     type: "Full-time",
-    location: "Budigere Cross & Seegehalli sites",
+    location: "Vemagal project sites",
     exp: "Diploma/B.E. Civil, 2+ years",
     desc: "Supervise road works, UGD, levelling and plot marking at our active layouts.",
   },

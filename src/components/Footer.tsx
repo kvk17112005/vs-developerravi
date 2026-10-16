@@ -1,31 +1,51 @@
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CONTACT, PROJECTS, TAGLINE, TRUST_BADGES } from "../data/site";
-import { Icon, WhatsAppGlyph } from "./ui";
+import { EASE, Icon, Reveal, StaggerGroup, StaggerItem, WhatsAppGlyph } from "./ui";
 import { Logo } from "./Navbar";
+
+const popIn = {
+  hidden: { opacity: 0, scale: 0.6, y: 18 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+};
 
 export function FloatingButtons() {
   return (
-    <div className="fixed bottom-5 right-4 z-[90] flex flex-col gap-3 sm:bottom-6 sm:right-6">
-      <a
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{
+        hidden: {},
+        show: { transition: { staggerChildren: 0.12, delayChildren: 0.9 } },
+      }}
+      className="fixed bottom-5 right-4 z-[90] flex flex-col gap-3 sm:bottom-6 sm:right-6"
+    >
+      <motion.a
+        variants={popIn}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.96 }}
         href={CONTACT.whatsapp(
           "Hello VS Developers! I'd like to know more about your plotted developments.",
         )}
         target="_blank"
         rel="noreferrer"
         aria-label="Chat on WhatsApp"
-        className="pulse-ring group flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl shadow-[#25D366]/40 transition hover:scale-105"
+        className="pulse-ring group flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl shadow-[#25D366]/40"
       >
         <WhatsAppGlyph className="h-7 w-7" />
-      </a>
-      <a
+      </motion.a>
+      <motion.a
+        variants={popIn}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.96 }}
         href={CONTACT.phoneHref}
         aria-label="Call now"
-        className="pulse-ring group flex h-14 w-14 items-center justify-center rounded-full bg-forest-600 text-white shadow-xl shadow-forest-600/40 transition hover:scale-105"
+        className="pulse-ring group flex h-14 w-14 items-center justify-center rounded-full bg-forest-600 text-white shadow-xl shadow-forest-600/40"
         style={{ animationDelay: "0.6s" }}
       >
         <Icon name="phone" className="h-6 w-6" />
-      </a>
-    </div>
+      </motion.a>
+    </motion.div>
   );
 }
 
@@ -36,8 +56,8 @@ export default function Footer() {
       <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-forest-600/30 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-16 sm:px-8 sm:pt-20">
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
-          <div>
+        <StaggerGroup className="grid gap-12 lg:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
+          <StaggerItem>
             <Logo light />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/70">
               {TAGLINE} Family-run plotted developments in Bengaluru East — approved,
@@ -54,12 +74,12 @@ export default function Footer() {
                 </span>
               ))}
             </div>
-          </div>
+          </StaggerItem>
 
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
+          <StaggerItem>
+            <h2 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
               Explore
-            </h4>
+            </h2>
             <ul className="mt-5 space-y-3 text-sm">
               {[
                 { to: "/", label: "Home" },
@@ -72,19 +92,19 @@ export default function Footer() {
                 <li key={l.to}>
                   <Link
                     to={l.to}
-                    className="text-white/70 transition hover:text-mint-200"
+                    className="link-underline text-white/70 transition hover:text-mint-200"
                   >
                     {l.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </StaggerItem>
 
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
+          <StaggerItem>
+            <h2 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
               Our Projects
-            </h4>
+            </h2>
             <ul className="mt-5 space-y-4 text-sm">
               {PROJECTS.map((p) => (
                 <li key={p.slug}>
@@ -96,18 +116,18 @@ export default function Footer() {
                       {p.name}
                     </span>
                     <span className="mt-0.5 block text-xs text-white/50">
-                      {p.location.split(",")[0]} · {p.status}
+                      {p.location.split(",")[0]}
                     </span>
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
+          </StaggerItem>
 
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
+          <StaggerItem>
+            <h2 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
               Head Office
-            </h4>
+            </h2>
             <address className="mt-5 space-y-3.5 text-sm not-italic leading-relaxed text-white/70">
               <p className="flex gap-3">
                 <Icon name="mapPin" className="mt-0.5 h-4.5 w-4.5 shrink-0 text-gold-400" />
@@ -115,14 +135,14 @@ export default function Footer() {
               </p>
               <a
                 href={CONTACT.phoneHref}
-                className="flex items-center gap-3 transition hover:text-mint-200"
+                className="link-underline flex w-fit items-center gap-3 whitespace-nowrap transition hover:text-mint-200"
               >
                 <Icon name="phone" className="h-4.5 w-4.5 shrink-0 text-gold-400" />
                 {CONTACT.phone}
               </a>
               <a
                 href={`mailto:${CONTACT.email}`}
-                className="flex items-center gap-3 break-all transition hover:text-mint-200"
+                className="link-underline flex w-fit items-center gap-3 break-all transition hover:text-mint-200"
               >
                 <Icon name="mail" className="h-4.5 w-4.5 shrink-0 text-gold-400" />
                 {CONTACT.email}
@@ -132,15 +152,15 @@ export default function Footer() {
                 {CONTACT.hours}
               </p>
             </address>
-          </div>
-        </div>
+          </StaggerItem>
+        </StaggerGroup>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-7 text-xs text-white/45 sm:flex-row">
+        <Reveal className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-7 text-xs text-white/45 sm:flex-row">
           <p>
             © {new Date().getFullYear()} VS Developers, Bengaluru. All rights reserved.
           </p>
           <p className="tracking-[0.22em] uppercase">A Trusted Property Partner.</p>
-        </div>
+        </Reveal>
       </div>
     </footer>
   );

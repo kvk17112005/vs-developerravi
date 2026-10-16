@@ -10,7 +10,7 @@ import {
   ScrollText,
   TextReveal,
   WhatsAppGlyph,
-  usePageTitle,
+  usePageMeta,
 } from "../components/ui";
 import { CONTACT, PROJECTS } from "../data/site";
 import { cn } from "../utils/cn";
@@ -24,7 +24,10 @@ const TRUST_TICKER = [
 ];
 
 export default function Projects() {
-  usePageTitle("Our Projects | VS Developers | Plotted Developments in Bengaluru");
+  usePageMeta(
+    "Our Projects | VS Developers | Plotted Developments in Bengaluru",
+    "Compare VS Heritage, VS Rose Meadows and VS Yogitha Garden — acres, plot sizes, approvals and site details for DTCP approved plots in Bengaluru East.",
+  );
 
   return (
     <div className="bg-white">
@@ -83,11 +86,6 @@ export default function Projects() {
               "DC Converted",
             ];
 
-            const isSoldOut =
-              p.status === "Sold Out" || p.status === "100% Sold Out" || p.status === "Completed";
-            const statusBadgeText = isSoldOut ? "100% SOLD OUT" : p.status.toUpperCase();
-            const statusBadgeColor = isSoldOut ? "bg-[#1f6b3d] text-white" : "bg-gold-500 text-forest-950";
-
             return (
               <Reveal key={p.slug} delay={idx * 0.12} y={36}>
                 <div className="group/card grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
@@ -110,21 +108,8 @@ export default function Projects() {
 
                   {/* Details Column */}
                   <div className={cn(reverseLayout && "lg:order-1")}>
-                    {/* Status Pill */}
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider",
-                          statusBadgeColor
-                        )}
-                      >
-                        <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                        {statusBadgeText}
-                      </span>
-                    </div>
-
                     {/* Title & Location */}
-                    <h2 className="mt-4 font-display text-4xl font-semibold text-forest-950 transition-colors duration-500 group-hover/card:text-forest-600 sm:text-5xl">
+                    <h2 className="mt-0 font-display text-4xl font-semibold text-forest-950 transition-colors duration-500 group-hover/card:text-forest-600 sm:text-5xl">
                       <TextReveal mode="character">{p.name}</TextReveal>
                     </h2>
                     <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-forest-700">
@@ -217,11 +202,13 @@ export default function Projects() {
                 </span>
 
                 <h3 className="mt-4 font-display text-3xl font-semibold leading-tight sm:text-5xl text-white">
-                  One site visit is worth a hundred brochures.
+                  <TextReveal>One site visit is worth a hundred brochures.</TextReveal>
                 </h3>
 
                 <p className="mt-4 text-base leading-relaxed text-white/80 sm:text-lg">
-                  We'll walk you through the layout, the corner stones and the complete document set — morning or evening, any day of the week.
+                  <ScrollText>
+                    We'll walk you through the layout, the corner stones and the complete document set - morning or evening, any day of the week.
+                  </ScrollText>
                 </p>
 
                 <div className="mt-9 flex flex-wrap items-center justify-center gap-4">

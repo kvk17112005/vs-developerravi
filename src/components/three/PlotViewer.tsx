@@ -677,7 +677,7 @@ export default function PlotViewer({
         <div className="absolute left-4 top-4 flex flex-wrap gap-1.5 sm:left-5 sm:top-5">
           <span className="flex items-center gap-1.5 rounded-full border border-forest-600/15 bg-white/95 px-3 py-1.5 text-[10px] font-bold text-forest-800 shadow-sm backdrop-blur">
             <span className="h-2.5 w-2.5 rounded-full bg-[#1E4D2B] ring-2 ring-white" />
-            100% Sold Out & Delivered
+            Plots Delivered
           </span>
           <span className="flex items-center gap-1.5 rounded-full border border-forest-600/15 bg-white/95 px-3 py-1.5 text-[10px] font-bold text-forest-800 shadow-sm backdrop-blur">
             <span className="h-2.5 w-2.5 rounded-full bg-[#7A828A] ring-2 ring-white" />

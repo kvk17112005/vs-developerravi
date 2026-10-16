@@ -4,13 +4,16 @@ import {
   Cta,
   EASE,
   Icon,
+  ImageReveal,
   Magnetic,
   Reveal,
   ScrollText,
   SectionHeading,
+  StaggerGroup,
+  StaggerItem,
   TextReveal,
   TrustBadges,
-  usePageTitle,
+  usePageMeta,
 } from "../components/ui";
 import { CONTACT, TRUST_BADGES } from "../data/site";
 
@@ -26,7 +29,7 @@ const TIMELINE = [
   {
     year: "2017",
     title: "VS Heritage breaks ground",
-    desc: "Our flagship 12.5-acre layout at Kalkere, Bengaluru East begins. Avenue trees are planted before the first plot is sold.",
+    desc: "Our flagship 12.5-acre layout at Vemagal-Kurugal begins. Avenue trees are planted before the first plot is sold.",
   },
   {
     year: "2019",
@@ -36,12 +39,12 @@ const TIMELINE = [
   {
     year: "2022",
     title: "Expanding East",
-    desc: "VS Rosemeadows launches as a DTCP approved & DC converted layout at Sulibele Road, with our largest plots yet.",
+    desc: "VS Rose Meadows launches as a DTCP approved & DC converted layout in Vemagal-Kurugal, with our largest plots yet.",
   },
   {
     year: "2025",
-    title: "VS Yogitha & beyond",
-    desc: "1800+ plots delivered across 110+ acres. VS Yogitha opens in the Budigere growth corridor, minutes from Old Madras Road.",
+    title: "VS Yogitha Garden & beyond",
+    desc: "1800+ plots delivered across 110+ acres. VS Yogitha Garden opens in Vemagal Hosahalli.",
   },
 ];
 
@@ -95,7 +98,10 @@ function PageHero({ eyebrow, title, sub }: { eyebrow: string; title: React.React
 }
 
 export default function About() {
-  usePageTitle("About Us | VS Developers | A Trusted Property Partner");
+  usePageMeta(
+    "About Us | VS Developers | A Trusted Property Partner",
+    "Family-run since 2014. VS Developers has delivered 1800+ plots across 110+ acres of DTCP approved & DC converted layouts in Bengaluru East.",
+  );
 
   return (
     <>
@@ -155,28 +161,29 @@ export default function About() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.1}>
-            <div className="grid grid-cols-2 gap-4 sm:gap-5">
-              <img
+          <StaggerGroup className="grid grid-cols-2 gap-4 sm:gap-5" stagger={0.12}>
+            <StaggerItem className="col-span-2">
+              <ImageReveal
                 src={px(17846380)}
                 alt="VS Heritage layout from above"
-                loading="lazy"
-                className="col-span-2 h-56 w-full rounded-[1.75rem] object-cover card-shadow sm:h-64"
+                className="h-56 w-full rounded-[1.75rem] card-shadow sm:h-64"
               />
-              <img
+            </StaggerItem>
+            <StaggerItem>
+              <ImageReveal
                 src={px(7581110)}
                 alt="The VS team reviewing site plans"
-                loading="lazy"
-                className="h-44 w-full rounded-[1.75rem] object-cover card-shadow sm:h-52"
+                className="h-44 w-full rounded-[1.75rem] card-shadow sm:h-52"
               />
-              <img
+            </StaggerItem>
+            <StaggerItem>
+              <ImageReveal
                 src={px(12029158)}
                 alt="Avenue plantation"
-                loading="lazy"
-                className="h-44 w-full rounded-[1.75rem] object-cover card-shadow sm:h-52"
+                className="h-44 w-full rounded-[1.75rem] card-shadow sm:h-52"
               />
-            </div>
-          </Reveal>
+            </StaggerItem>
+          </StaggerGroup>
         </div>
       </section>
 
@@ -338,21 +345,21 @@ export default function About() {
 
       {/* quick contact strip */}
       <section className="bg-white py-10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:px-8 sm:text-left">
+        <Reveal className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 text-center sm:flex-row sm:px-8 sm:text-left">
           <p className="text-sm text-forest-900/60">
             Prefer a call?{" "}
-            <a href={CONTACT.phoneHref} className="font-bold text-forest-600">
+            <a href={CONTACT.phoneHref} className="link-underline whitespace-nowrap font-bold text-forest-600">
               {CONTACT.phone}
             </a>{" "}
             ·{" "}
-            <a href={`mailto:${CONTACT.email}`} className="font-bold text-forest-600">
+            <a href={`mailto:${CONTACT.email}`} className="link-underline font-bold text-forest-600">
               {CONTACT.email}
             </a>
           </p>
-          <Link to="/projects" className="text-xs font-bold uppercase tracking-[0.2em] text-forest-600 hover:text-forest-700">
-            Explore our projects →
+          <Link to="/projects" className="link-underline text-xs font-bold uppercase tracking-[0.2em] text-forest-600 hover:text-forest-700">
+            Explore our projects
           </Link>
-        </div>
+        </Reveal>
       </section>
     </>
   );

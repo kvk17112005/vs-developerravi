@@ -5,12 +5,15 @@ import {
   EASE,
   Field,
   Icon,
+  ImageReveal,
   inputCls,
   Reveal,
   ScrollText,
   SectionHeading,
+  StaggerGroup,
+  StaggerItem,
   TextReveal,
-  usePageTitle,
+  usePageMeta,
 } from "../components/ui";
 import { CONTACT, ROLES } from "../data/site";
 import { cn } from "../utils/cn";
@@ -26,7 +29,10 @@ const CULTURE = [
 ];
 
 export default function Careers() {
-  usePageTitle("Careers | Join VS Developers | Bengaluru");
+  usePageMeta(
+    "Careers | Join VS Developers | Bengaluru",
+    "Open roles at VS Developers, Bengaluru — sales, site engineering, digital marketing, relationship management and documentation.",
+  );
   const [openRole, setOpenRole] = useState<number | null>(0);
   const [form, setForm] = useState({
     name: "",
@@ -83,20 +89,22 @@ export default function Careers() {
       <section className="bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
-            <div className="grid grid-cols-2 gap-4">
-              <img
-                src={px(7581110)}
-                alt="Team discussion"
-                loading="lazy"
-                className="h-56 w-full rounded-[1.5rem] object-cover card-shadow sm:h-64"
-              />
-              <img
-                src={px(7580644)}
-                alt="The VS desk"
-                loading="lazy"
-                className="mt-8 h-56 w-full rounded-[1.5rem] object-cover card-shadow sm:h-64"
-              />
-            </div>
+            <StaggerGroup className="grid grid-cols-2 gap-4" stagger={0.14}>
+              <StaggerItem>
+                <ImageReveal
+                  src={px(7581110)}
+                  alt="Team discussion"
+                  className="h-56 w-full rounded-[1.5rem] card-shadow sm:h-64"
+                />
+              </StaggerItem>
+              <StaggerItem className="mt-8">
+                <ImageReveal
+                  src={px(7580644)}
+                  alt="The VS desk"
+                  className="h-56 w-full rounded-[1.5rem] card-shadow sm:h-64"
+                />
+              </StaggerItem>
+            </StaggerGroup>
             <div>
               <SectionHeading
                 center={false}
@@ -151,9 +159,9 @@ export default function Careers() {
                       className="flex w-full items-center justify-between gap-4 p-5 text-left"
                     >
                       <div>
-                        <h3 className="hover-title font-display text-lg font-semibold text-forest-900">
+                        <h2 className="hover-title font-display text-lg font-semibold text-forest-900">
                           {r.title}
-                        </h3>
+                        </h2>
                         <p className="mt-1 text-xs font-semibold text-forest-600">
                           {r.type} · {r.location}
                         </p>
@@ -206,9 +214,9 @@ export default function Careers() {
                 onSubmit={submit}
                 className="sticky top-28 rounded-[2rem] border border-forest-600/10 bg-white p-7 card-shadow sm:p-9"
               >
-                <h3 className="font-display text-2xl font-semibold text-forest-900">
+                <h2 className="font-display text-2xl font-semibold text-forest-900">
                   Apply now
-                </h3>
+                </h2>
                 <p className="mt-1.5 text-sm text-forest-900/55">
                   We read every application personally.
                 </p>

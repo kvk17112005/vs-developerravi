@@ -7,7 +7,7 @@ import {
   ParallaxImage,
   ScrollText,
   TextReveal,
-  usePageTitle,
+  usePageMeta,
 } from "../components/ui";
 import { PROJECTS, type GalleryItem } from "../data/site";
 import { cn } from "../utils/cn";
@@ -17,12 +17,12 @@ import { cn } from "../utils/cn";
 
 
 // const EXTRA: GalleryItem[] = [
-//   { src: px(31228856), caption: "Summer avenue - VS Rosemeadows", type: "photo" },
+//   { src: px(31228856), caption: "Summer avenue - VS Rose Meadows", type: "photo" },
 //   { src: px(37635080), caption: "Park greenery at VS Heritage", type: "photo" },
 //   { src: px(12041474), caption: "Tree cover along Plot Row 4", type: "photo" },
 //   { src: px(7174115), caption: "Owner-built garden pathway", type: "360" },
 //   { src: px(29926504), caption: "The neighbourhood from above", type: "360" },
-//   { src: px(7061659), caption: "A completed villa, VS Yogitha", type: "photo" },
+//   { src: px(7061659), caption: "A completed villa, VS Yogitha Garden", type: "photo" },
 //   { src: px(7580648), caption: "Our documentation desk at work", type: "photo" },
 //   { src: px(7581119), caption: "Title verification session", type: "photo" },
 // ];
@@ -34,10 +34,13 @@ const VIDEOS: GalleryItem[] = PROJECTS.map((p) => ({
   video: p.video,
 }));
 
-type Filter = "All" | "VS Heritage" | "VS Rosemeadows" | "VS Yogitha" | "Videos" | "360°";
+type Filter = "All" | "VS Heritage" | "VS Rose Meadows" | "VS Yogitha Garden" | "Videos" | "360°";
 
 export default function Gallery() {
-  usePageTitle("Gallery | VS Developers | Plotted Developments in Bengaluru");
+  usePageMeta(
+    "Gallery | VS Developers | Plotted Developments in Bengaluru",
+    "Aerial photos, site shots and 360° walks from VS Heritage, VS Rose Meadows and VS Yogitha Garden — see roads, parks and plot markings before your visit.",
+  );
   const [filter, setFilter] = useState<Filter>("All");
   const [lb, setLb] = useState<number | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
@@ -52,8 +55,8 @@ export default function Gallery() {
     if (filter === "360°") return all.filter((g) => g.type === "360");
     if (filter === "Videos") return all.filter((g) => g.type === "video");
     if (filter === "VS Heritage") return all.filter((g) => g.src.includes("heritage"));
-    if (filter === "VS Rosemeadows") return all.filter((g) => g.src.includes("rose"));
-    if (filter === "VS Yogitha") return all.filter((g) => g.src.includes("yogitha"));
+    if (filter === "VS Rose Meadows") return all.filter((g) => g.src.includes("rose"));
+    if (filter === "VS Yogitha Garden") return all.filter((g) => g.src.includes("yogitha"));
     return all;
   }, [all, filter]);
 
@@ -99,7 +102,7 @@ export default function Gallery() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           {/* filters */}
           <div className="flex flex-wrap items-center justify-center gap-2.5">
-            {(["All", "VS Heritage", "VS Rosemeadows", "VS Yogitha", "Videos", "360°"] as Filter[]).map((f) => (
+            {(["All", "VS Heritage", "VS Rose Meadows", "VS Yogitha Garden", "Videos", "360°"] as Filter[]).map((f) => (
               <button
                 key={f}
                 onClick={() => {
@@ -107,15 +110,24 @@ export default function Gallery() {
                   setPlaying(null);
                 }}
                 className={cn(
-                  "rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition-all duration-300",
+                  "relative overflow-hidden rounded-full px-6 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition-colors duration-300",
                   filter === f
-                    ? "bg-forest-600 text-white shadow-lg shadow-forest-600/25"
+                    ? "text-white"
                     : "border border-forest-600/20 bg-white text-forest-700 hover:border-forest-600/50 hover:bg-mint-100/60",
                 )}
               >
-                {f === "Videos" && <Icon name="video" className="mr-1.5 inline h-3.5 w-3.5" />}
-                {f === "360°" && <Icon name="rotate" className="mr-1.5 inline h-3.5 w-3.5" />}
-                {f}
+                {filter === f && (
+                  <motion.span
+                    layoutId="gallery-filter-pill"
+                    transition={{ type: "spring", stiffness: 420, damping: 36 }}
+                    className="absolute inset-0 rounded-full bg-forest-600 shadow-lg shadow-forest-600/25"
+                  />
+                )}
+                <span className="relative z-10">
+                  {f === "Videos" && <Icon name="video" className="mr-1.5 inline h-3.5 w-3.5" />}
+                  {f === "360°" && <Icon name="rotate" className="mr-1.5 inline h-3.5 w-3.5" />}
+                  {f}
+                </span>
               </button>
             ))}
           </div>
@@ -132,9 +144,10 @@ export default function Gallery() {
                     key={g.src + g.type + i}
                     layout
                     initial={{ opacity: 0, scale: 0.94 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, amount: 0.15 }}
                     exit={{ opacity: 0, scale: 0.94 }}
-                    transition={{ duration: 0.5, ease: EASE }}
+                    transition={{ duration: 0.5, ease: EASE, delay: (i % 3) * 0.07 }}
                     className="mb-5 break-inside-avoid"
                   >
                     <button

@@ -22,7 +22,7 @@ import {
   SectionHeading,
   TextReveal,
   TrustBadges,
-  usePageTitle,
+  usePageMeta,
 } from "../components/ui";
 
 const PlotViewer = lazy(() => import("../components/three/PlotViewer"));
@@ -62,7 +62,12 @@ export default function ProjectDetail() {
   const [lb, setLb] = useState<number | null>(null);
   const [form, setForm] = useState({ name: "", phone: "", plot: "" });
 
-  usePageTitle(project ? `${project.name} | VS Developers | ${project.location}` : "Project | VS Developers");
+  usePageMeta(
+    project ? `${project.name} | VS Developers | ${project.location}` : "Project | VS Developers",
+    project
+      ? `${project.name} at ${project.location} — ${project.areaAcres} acres, ${project.plotCount} plots, ${project.sizes}. ${project.approvals}. Book a site visit.`
+      : "DTCP approved and DC converted plotted developments from VS Developers in Bengaluru East.",
+  );
 
   if (!project) return <Navigate to="/projects" replace />;
 
@@ -119,10 +124,7 @@ export default function ProjectDetail() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.8, ease: EASE }}
           >
-            <span className="inline-block rounded-full bg-gold-500 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-forest-900">
-              {project.status}
-            </span>
-            <h1 className="mt-4 font-display text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="font-display text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
               <TextReveal mode="character">{project.name}</TextReveal>
             </h1>
             <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-mint-200 sm:text-base">
@@ -141,7 +143,7 @@ export default function ProjectDetail() {
             { v: project.plotCount, suffix: "", label: "Plots" },
             { v: 0, suffix: "", label: "Plot Sizes", text: project.sizes },
             { v: 0, suffix: "", label: "Approvals", text: project.approvals },
-            { v: 0, suffix: "", label: "Status", text: project.status },
+            { v: 0, suffix: "", label: "Handover", text: "Delivered" },
           ].map((f, i) => (
             <motion.div
               key={f.label}
@@ -268,32 +270,27 @@ export default function ProjectDetail() {
               <div className="flex items-center gap-3">
                 <span className="h-px w-9 bg-gold-500/70" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-gold-600">
-                  Location Advantages
+                  Location
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-                <ScrollText>
-                  In the middle of<em className="text-forest-600"> everything.</em>
-                </ScrollText>
+                <ScrollText>{project.location}</ScrollText>
               </h2>
-              {project.address && (
-                <address className="mt-4 not-italic text-sm font-medium text-forest-800/70">
-                  {project.address}
-                </address>
-              )}
             </Reveal>
-            <div className="mt-8 space-y-4">
-              {project.locationAdvantages.map((l, i) => (
-                <Reveal key={l} delay={i * 0.08}>
-                  <div className="hover-card flex items-center gap-4 rounded-2xl border border-forest-600/10 bg-white p-4.5 hover:border-forest-600/25 hover:shadow-lg">
-                    <span className="hover-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint-100 text-forest-600">
-                      <Icon name="mapPin" className="h-5 w-5" />
-                    </span>
-                    <p className="hover-title text-sm font-semibold text-forest-800">{l}</p>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
+            {project.locationAdvantages.length > 0 && (
+              <div className="mt-8 space-y-4">
+                {project.locationAdvantages.map((l, i) => (
+                  <Reveal key={l} delay={i * 0.08}>
+                    <div className="hover-card flex items-center gap-4 rounded-2xl border border-forest-600/10 bg-white p-4.5 hover:border-forest-600/25 hover:shadow-lg">
+                      <span className="hover-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint-100 text-forest-600">
+                        <Icon name="mapPin" className="h-5 w-5" />
+                      </span>
+                      <p className="hover-title text-sm font-semibold text-forest-800">{l}</p>
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            )}
           </div>
           <Reveal delay={0.1}>
             <div className="relative overflow-hidden rounded-[2rem] border border-forest-600/10 card-shadow">
@@ -422,7 +419,7 @@ export default function ProjectDetail() {
               </a>
               <a
                 href={CONTACT.phoneHref}
-                className="inline-flex items-center gap-2 rounded-full border-2 border-white/40 px-6 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white/10"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border-2 border-white/40 px-6 py-3 text-sm font-bold text-white transition hover:border-white hover:bg-white/10"
               >
                 <Icon name="phone" className="h-4 w-4" /> {CONTACT.phone}
               </a>
@@ -479,7 +476,7 @@ export default function ProjectDetail() {
 
       {/* ---------- next project ---------- */}
       <section className="bg-mint-100 py-12">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-5 sm:flex-row sm:px-8">
+        <Reveal className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-5 sm:flex-row sm:px-8">
           <p className="font-display text-xl font-semibold text-forest-800 sm:text-2xl">
             Continue exploring
           </p>
@@ -488,7 +485,7 @@ export default function ProjectDetail() {
               Next: {nextProject.name} <Icon name="arrowR" className="h-4 w-4" />
             </Cta>
           </Magnetic>
-        </div>
+        </Reveal>
       </section>
     </>
   );

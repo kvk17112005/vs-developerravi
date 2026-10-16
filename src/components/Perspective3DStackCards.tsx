@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { useRef } from "react";
 import { CONTACT } from "../data/site";
-import { Icon, WhatsAppGlyph } from "./ui";
+import { Icon, Reveal, TextReveal, WhatsAppGlyph } from "./ui";
 
 /* ------------------------------------------------------------------ */
 /*  Interactive 3D Perspective Stacking Cards ("Building Communities") */
@@ -160,13 +160,19 @@ function ScrollStackCard({
   const start = index / STACK_CARDS.length;
   const end = (index + 1) / STACK_CARDS.length;
   const y = useTransform(progress, [start, end], ["110%", "0%"]);
-  const scale = useTransform(progress, [start, end], [0.96, 1]);
-  const opacity = useTransform(progress, [start, end], [0, 1]);
+  const scale = useTransform(progress, [start, end], [0.97, 1]);
 
+  // Cards are always fully opaque — the incoming card slides up from below and
+  // the stack box clips it (overflow-hidden on the container), so the previous
+  // card is never visible *through* it. No opacity fade → no washed-out look.
   return (
     <motion.div
-      style={{ y: index === 0 ? 0 : y, scale: index === 0 ? 1 : scale, opacity: index === 0 ? 1 : opacity, zIndex: index + 1 }}
-      className={`group absolute inset-0 overflow-hidden rounded-[2.25rem] border border-white/20 p-6 shadow-2xl backdrop-blur-xl sm:p-10 bg-gradient-to-br ${card.bgGradient}`}
+      style={{
+        y: index === 0 ? 0 : y,
+        scale: index === 0 ? 1 : scale,
+        zIndex: index + 1,
+      }}
+      className={`group absolute inset-0 overflow-hidden rounded-[2.25rem] border border-white/20 p-6 sm:p-10 bg-gradient-to-br ${card.bgGradient}`}
     >
       <div className="grid h-full items-center gap-6 sm:grid-cols-12 sm:gap-8">
         <div className="flex flex-col justify-between sm:col-span-7">
@@ -213,8 +219,8 @@ function ScrollStackCard({
           </div>
         </div>
 
-        <div className="relative hidden h-full flex-col justify-between sm:col-span-5 sm:flex">
-          <div className="relative h-60 w-full overflow-hidden rounded-2xl border border-white/20 shadow-xl">
+        <div className="relative hidden h-full flex-col gap-3 sm:col-span-5 sm:flex">
+          <div className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-white/20 shadow-xl">
             <img src={card.image} alt={card.title} className="h-full w-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-forest-950/80 via-transparent to-transparent" />
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
@@ -225,7 +231,7 @@ function ScrollStackCard({
             </div>
           </div>
 
-          <div className="mt-3 flex items-center justify-between rounded-xl border border-white/15 bg-white/10 p-3.5 backdrop-blur">
+          <div className="flex items-center justify-between rounded-xl border border-white/15 bg-white/10 p-3.5">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-white/60">
                 {card.highlightMetric.label}
@@ -246,19 +252,22 @@ function ScrollStackCard({
 
 export default function Perspective3DStackCards() {
   const sectionRef = useRef<HTMLElement>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+  // Progress is measured against the tall scroll track only, so every card's
+  // window maps to the pinned range and no dead scroll is left between cards.
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: stackRef,
     offset: ["start start", "end end"],
   });
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden bg-white py-20 sm:py-28">
+    <section ref={sectionRef} className="relative bg-white py-20 sm:py-28">
       {/* Background Subtle Gradient */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#FAF7F0] to-transparent" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-8">
         {/* Section Header */}
-        <div className="text-center">
+        <Reveal className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-forest-600/20 bg-mint-50 px-4 py-1.5 shadow-sm">
             <span className="h-2 w-2 rounded-full bg-forest-600" />
             <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-forest-800">
@@ -267,16 +276,20 @@ export default function Perspective3DStackCards() {
           </div>
 
           <h2 className="mt-4 font-display text-3xl font-semibold leading-[1.12] tracking-tight text-forest-900 sm:text-5xl">
-            Building Communities. <em className="text-forest-700">Creating Value.</em>
+            <TextReveal mode="character">
+              Building Communities. <em className="text-forest-700">Creating Value.</em>
+            </TextReveal>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-forest-900/65 sm:text-base">
-            Scroll to move through our legal assurance, delivered infrastructure, strategic growth corridors, and master planning.
+            <TextReveal>
+              Scroll to move through our legal assurance, delivered infrastructure, strategic growth corridors, and master planning.
+            </TextReveal>
           </p>
-        </div>
+        </Reveal>
 
-        <div className="relative mt-12 h-[500vh]">
-          <div className="sticky top-6 flex h-[600px] items-center justify-center [perspective:1400px] sm:h-[500px]">
-            <div className="relative h-full w-full max-w-4xl">
+        <div ref={stackRef} className="relative mt-12 h-[500vh]">
+          <div className="sticky top-0 flex h-screen items-center justify-center [perspective:1400px]">
+            <div className="relative h-[clamp(440px,calc(100vh-7rem),600px)] w-full max-w-6xl overflow-hidden rounded-[2.25rem] shadow-2xl">
               {STACK_CARDS.map((card, index) => (
                 <ScrollStackCard
                   key={card.id}
