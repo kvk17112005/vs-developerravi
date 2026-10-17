@@ -55,7 +55,7 @@ export default function Projects() {
               CURATED PLOTTED DEVELOPMENTS
             </div>
             <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-950 sm:text-6xl">
-              <TextReveal mode="character">
+              <TextReveal>
                 Three layouts.{" "}
                 <span className="relative inline-block italic font-normal text-forest-900 underline decoration-gold-400 decoration-2 underline-offset-8">
                   One standard.
@@ -110,7 +110,7 @@ export default function Projects() {
                   <div className={cn(reverseLayout && "lg:order-1")}>
                     {/* Title & Location */}
                     <h2 className="mt-0 font-display text-4xl font-semibold text-forest-950 transition-colors duration-500 group-hover/card:text-forest-600 sm:text-5xl">
-                      <TextReveal mode="character">{p.name}</TextReveal>
+                      <TextReveal>{p.name}</TextReveal>
                     </h2>
                     <p className="mt-2 flex items-center gap-1.5 text-sm font-medium text-forest-700">
                       <Icon name="mapPin" className="h-4 w-4 text-forest-600 shrink-0" />

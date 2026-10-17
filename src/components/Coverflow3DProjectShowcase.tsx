@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CONTACT } from "../data/site";
 import { cn } from "../utils/cn";
 import { EASE, Icon, TextReveal, WhatsAppGlyph } from "./ui";
@@ -165,27 +165,7 @@ const COVERFLOW_ITEMS: CoverflowCard[] = [
 ];
 
 export default function Coverflow3DProjectShowcase() {
-  const [activeIndex, setActiveIndex] = useState(2);
   const [selectedCard, setSelectedCard] = useState<CoverflowCard | null>(null);
-
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + COVERFLOW_ITEMS.length) % COVERFLOW_ITEMS.length);
-  };
-
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % COVERFLOW_ITEMS.length);
-  };
-
-  // Keyboard arrow keys
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (selectedCard) return;
-      if (e.key === "ArrowLeft") { e.preventDefault(); handlePrev(); }
-      if (e.key === "ArrowRight") { e.preventDefault(); handleNext(); }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedCard]);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#FAF7F0] via-[#F3EFE6] to-[#E9E4D8] py-20 sm:py-28">
@@ -215,93 +195,44 @@ export default function Coverflow3DProjectShowcase() {
           </p>
         </div>
 
-        {/* 3D Coverflow Perspective Stage */}
-        <div className="relative mt-14 flex items-center justify-center [perspective:1400px]">
-          <div className="relative flex h-[460px] w-full max-w-[1020px] items-center justify-center sm:h-[500px]">
-            {COVERFLOW_ITEMS.map((item, idx) => {
-              const offset = idx - activeIndex;
-              const isActive = idx === activeIndex;
-              // const isPrev = offset === -1 || (activeIndex === 0 && idx === COVERFLOW_ITEMS.length - 1);
-              // const isNext = offset === 1 || (activeIndex === COVERFLOW_ITEMS.length - 1 && idx === 0);
-
-              // Calculate 3D transformation values
-              let xTranslate = 0;
-              let zTranslate = 0;
-              let rotateY = 0;
-              let scale = 1;
-              let opacity = 1;
-              let zIndex = 10;
-
-              if (isActive) {
-                xTranslate = 0;
-                zTranslate = 140;
-                rotateY = 0;
-                scale = 1.08;
-                opacity = 1;
-                zIndex = 30;
-              } else if (offset === -1 || (offset > 1 && offset === COVERFLOW_ITEMS.length - 1)) {
-                xTranslate = -240;
-                zTranslate = -40;
-                rotateY = 32;
-                scale = 0.88;
-                opacity = 0.85;
-                zIndex = 20;
-              } else if (offset === 1 || (offset < -1 && offset === -(COVERFLOW_ITEMS.length - 1))) {
-                xTranslate = 240;
-                zTranslate = -40;
-                rotateY = -32;
-                scale = 0.88;
-                opacity = 0.85;
-                zIndex = 20;
-              } else if (offset < -1) {
-                xTranslate = -420;
-                zTranslate = -180;
-                rotateY = 48;
-                scale = 0.74;
-                opacity = 0.35;
-                zIndex = 10;
-              } else {
-                xTranslate = 420;
-                zTranslate = -180;
-                rotateY = -48;
-                scale = 0.74;
-                opacity = 0.35;
-                zIndex = 10;
-              }
-
-              return (
-                <motion.div
-                  key={item.id}
-                  onClick={() => {
-                    if (isActive) {
-                      setSelectedCard(item);
-                    } else {
-                      setActiveIndex(idx);
-                    }
-                  }}
-                  animate={{
-                    x: xTranslate,
-                    z: zTranslate,
-                    rotateY,
-                    scale,
-                    opacity,
-                  }}
-                  transition={{ duration: 0.55, ease: EASE }}
-                  style={{ zIndex }}
-                  className={cn(
-                    "group absolute h-[380px] w-[260px] cursor-pointer select-none rounded-[2rem] p-1.5 shadow-2xl transition-shadow duration-300 sm:h-[440px] sm:w-[300px]",
-                    isActive
-                      ? "ring-4 ring-gold-400/90 shadow-forest-950/40"
-                      : "hover:opacity-100",
-                  )}
-                >
-                  <div className="relative h-full w-full overflow-hidden rounded-[1.65rem] bg-forest-900 shadow-inner">
-                    {/* Card Cover Image */}
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="h-full w-full object-cover object-center transition-transform duration-700 hover:scale-105"
-                    />
+        {/* Edge-to-edge continuous card loop */}
+        <div
+          className="coverflow-marquee relative left-1/2 mt-14 flex h-[460px] w-screen -translate-x-1/2 items-center overflow-x-auto overflow-y-hidden [perspective:1400px] sm:h-[500px]"
+          role="region"
+          aria-label="Continuously scrolling project highlights. Select a card to view details."
+        >
+          <div className="coverflow-loop-track flex w-max shrink-0 items-center">
+            {[0, 1].map((copy) => (
+              <div
+                key={`coverflow-set-${copy}`}
+                className="flex shrink-0 items-center gap-6 pr-6"
+                aria-hidden={copy === 1}
+              >
+                {COVERFLOW_ITEMS.map((item, idx) => (
+                  <motion.button
+                    key={`${copy}-${item.id}`}
+                    type="button"
+                    onClick={() => setSelectedCard(item)}
+                    tabIndex={copy === 1 ? -1 : 0}
+                    aria-label={`${item.title}. ${item.shortDesc} Select to view details.`}
+                    className={cn(
+                      "group relative h-[380px] w-[260px] shrink-0 cursor-pointer select-none rounded-[2rem] p-1.5 text-left shadow-2xl transition-shadow duration-300 sm:h-[440px] sm:w-[300px]",
+                      idx % 2 === 0
+                        ? "[transform:rotateY(-5deg)] hover:[transform:rotateY(0deg)_translateY(-8px)]"
+                        : "[transform:rotateY(5deg)] hover:[transform:rotateY(0deg)_translateY(-8px)]",
+                      "focus-visible:outline focus-visible:outline-4 focus-visible:outline-gold-400",
+                    )}
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
+                    <div className="relative h-full w-full overflow-hidden rounded-[1.65rem] bg-forest-900 shadow-inner">
+                      {/* Card Cover Image */}
+                      <img
+                        src={item.image}
+                        alt=""
+                        loading={copy === 0 && idx < 3 ? "eager" : "lazy"}
+                        decoding="async"
+                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                      />
 
                     {/* Dark Vignette Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t from-forest-950 via-forest-950/50 to-transparent" />
@@ -337,47 +268,12 @@ export default function Coverflow3DProjectShowcase() {
                         </span>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Carousel Navigation Bar (Dots & Arrows) */}
-        <div className="mt-8 flex items-center justify-center gap-6">
-          <button
-            onClick={handlePrev}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-forest-600/30 bg-white text-forest-800 shadow-md transition hover:bg-forest-700 hover:text-white active:scale-90"
-            aria-label="Previous card"
-          >
-            <Icon name="chevL" className="h-5 w-5" />
-          </button>
-
-          {/* Dots Indicator */}
-          <div className="flex items-center gap-2">
-            {COVERFLOW_ITEMS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveIndex(i)}
-                className={cn(
-                  "h-2.5 rounded-full transition-all duration-300",
-                  i === activeIndex
-                    ? "w-8 bg-forest-700 shadow-sm"
-                    : "w-2.5 bg-forest-600/30 hover:bg-forest-600/60",
-                )}
-                aria-label={`Go to slide ${i + 1}`}
-              />
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
             ))}
           </div>
-
-          <button
-            onClick={handleNext}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-forest-600/30 bg-white text-forest-800 shadow-md transition hover:bg-forest-700 hover:text-white active:scale-90"
-            aria-label="Next card"
-          >
-            <Icon name="chevR" className="h-5 w-5" />
-          </button>
         </div>
       </div>
 

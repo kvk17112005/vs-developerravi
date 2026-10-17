@@ -24,7 +24,14 @@
   --color-gold-600: #b08a45;
   --color-gold-700: #8f6f36;
 
-  --ease-lux: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --motion-hover-duration: 280ms;
+  --motion-image-duration: 900ms;
+  --motion-image-scale: 1.06;
+  --motion-card-lift: 8px;
 }
 
 html {
@@ -36,7 +43,19 @@ body {
   background: #ffffff;
   color: var(--color-forest-900);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  content: "";
+  opacity: 0.16;
+  background-image: radial-gradient(rgba(23, 86, 49, 0.16) 0.45px, transparent 0.45px);
+  background-size: 5px 5px;
+  mix-blend-mode: multiply;
 }
 
 ::selection {
@@ -68,42 +87,50 @@ body {
 
 .card-shadow {
   box-shadow: 0 24px 60px -28px rgba(23, 86, 49, 0.28);
-  transition: box-shadow 500ms var(--ease-lux);
+  transition: box-shadow var(--motion-hover-duration) var(--ease-lux);
 }
 
 .card-shadow:hover {
-  box-shadow: 0 34px 72px -30px rgba(23, 86, 49, 0.38);
+  box-shadow: 0 30px 64px -30px rgba(23, 86, 49, 0.34);
 }
 
 .card-shadow.overflow-hidden img,
-.group img {
-  transition: transform 800ms var(--ease-lux);
+.group img:not(.will-change-transform),
+.hover-card img:not(.will-change-transform) {
+  transition: transform var(--motion-image-duration) var(--ease-lux);
 }
 
 .card-shadow.overflow-hidden:hover img,
-.group:hover img {
-  transform: scale(1.035);
+.group:hover img:not(.will-change-transform),
+.hover-card:hover img:not(.will-change-transform) {
+  transform: scale(var(--motion-image-scale));
 }
 
 /* ---------- card hover + text interactions ---------- */
 
 .hover-card {
+  background-image: radial-gradient(
+    circle 170px at var(--spotlight-x, -400px) var(--spotlight-y, -400px),
+    rgba(201, 161, 90, 0.14),
+    transparent 78%
+  );
+  background-repeat: no-repeat;
   transition:
-    transform 550ms var(--ease-lux),
-    box-shadow 550ms var(--ease-lux),
-    border-color 400ms ease,
-    background-color 400ms ease;
-  will-change: transform;
+    transform var(--motion-hover-duration) var(--ease-lux),
+    box-shadow var(--motion-hover-duration) var(--ease-lux),
+    border-color var(--motion-hover-duration) var(--ease-lux),
+    background-color var(--motion-hover-duration) var(--ease-lux);
+  transform-style: preserve-3d;
 }
 
 .hover-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(calc(0px - var(--motion-card-lift)));
 }
 
 .hover-card .hover-title {
   transition:
-    color 450ms var(--ease-lux),
-    letter-spacing 450ms var(--ease-lux);
+    color var(--motion-hover-duration) var(--ease-lux),
+    letter-spacing var(--motion-hover-duration) var(--ease-lux);
 }
 
 .hover-card:hover .hover-title {
@@ -112,7 +139,7 @@ body {
 }
 
 .hover-card .hover-desc {
-  transition: color 450ms var(--ease-lux);
+  transition: color var(--motion-hover-duration) var(--ease-lux);
 }
 
 .hover-card:hover .hover-desc {
@@ -120,7 +147,7 @@ body {
 }
 
 .hover-card .hover-arrow {
-  transition: transform 450ms var(--ease-lux);
+  transition: transform var(--motion-hover-duration) var(--ease-lux);
 }
 
 .hover-card:hover .hover-arrow {
@@ -129,9 +156,9 @@ body {
 
 .hover-card .hover-icon {
   transition:
-    transform 450ms var(--ease-lux),
-    background-color 450ms var(--ease-lux),
-    color 450ms var(--ease-lux);
+    transform var(--motion-hover-duration) var(--ease-lux),
+    background-color var(--motion-hover-duration) var(--ease-lux),
+    color var(--motion-hover-duration) var(--ease-lux);
 }
 
 .hover-card:hover .hover-icon {
@@ -141,7 +168,7 @@ body {
 .hover-card .hover-underline {
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 500ms var(--ease-lux);
+  transition: transform var(--motion-image-duration) var(--ease-lux);
 }
 
 .hover-card:hover .hover-underline {
@@ -152,8 +179,8 @@ body {
   opacity: 0;
   transform: translateY(10px);
   transition:
-    opacity 450ms var(--ease-lux),
-    transform 450ms var(--ease-lux);
+    opacity var(--motion-hover-duration) var(--ease-lux),
+    transform var(--motion-hover-duration) var(--ease-lux);
 }
 
 .hover-card:hover .hover-reveal {
@@ -164,6 +191,21 @@ body {
 .scroll-word {
   display: inline-block;
   will-change: opacity, transform, filter;
+}
+
+.text-reveal-mask {
+  overflow: hidden;
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+  line-height: inherit;
+  vertical-align: bottom;
+}
+
+.hero-letter-mask {
+  overflow: hidden;
+  padding-block: 0.1em;
+  margin-block: -0.1em;
+  vertical-align: bottom;
 }
 
 a,
@@ -233,6 +275,38 @@ a:active {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+.coverflow-loop-track {
+  animation: coverflow-drift 44s linear infinite;
+  will-change: transform;
+}
+
+.coverflow-marquee {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.coverflow-marquee::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes coverflow-drift {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.coverflow-marquee:hover .coverflow-loop-track,
+.coverflow-marquee:focus-within .coverflow-loop-track {
+  animation-play-state: paused;
+}
+
+.coverflow-marquee:focus-within {
+  scroll-behavior: smooth;
 }
 
 @keyframes spin-slow {
@@ -307,11 +381,25 @@ a:active {
   background-size: 100% 1.5px;
 }
 
+.nav-roll {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.nav-roll-track {
+  display: flex;
+  flex-direction: column;
+  line-height: 1em;
+}
+
 /* ---------- image reveal + hover zoom ---------- */
 
 .media-frame {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .media-frame img,
@@ -325,59 +413,31 @@ a:active {
   transform: scale(1.06);
 }
 
-.will-transform {
-  will-change: transform;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+@media (hover: hover) and (pointer: fine) {
+  .media-frame::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    content: "";
+    opacity: 0;
+    background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.16) 48%, transparent 68%);
+    transform: translateX(-24%);
+    transition:
+      opacity 450ms ease,
+      transform 900ms var(--ease-lux);
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .animate-marquee {
-    animation: none !important;
-  }
-
-  .hover-card,
-  .hover-card .hover-title,
-  .hover-card .hover-desc,
-  .hover-card .hover-arrow,
-  .hover-card .hover-icon,
-  .hover-card .hover-underline,
-  .hover-card .hover-reveal {
-    transition: none !important;
+  .media-frame:hover::after {
+    opacity: 1;
+    transform: translateX(24%);
   }
 
   .hover-card:hover {
-    transform: none !important;
+    transform: translateY(calc(0px - var(--motion-card-lift)));
   }
+}
 
-  .media-frame img,
-  .media-zoom img,
-  .media-frame:hover img,
-  .media-zoom:hover img {
-    transform: none !important;
-    transition: none !important;
-  }
-
-  .link-underline::after {
-    transition: none !important;
-  }
-
-  .nav-underline {
-    transition: color 200ms ease;
-  }
-
-  .will-transform {
-    will-change: auto;
-  }
+.will-transform {
+  will-change: transform;
 }

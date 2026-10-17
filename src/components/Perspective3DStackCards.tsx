@@ -276,7 +276,7 @@ export default function Perspective3DStackCards() {
           </div>
 
           <h2 className="mt-4 font-display text-3xl font-semibold leading-[1.12] tracking-tight text-forest-900 sm:text-5xl">
-            <TextReveal mode="character">
+            <TextReveal>
               Building Communities. <em className="text-forest-700">Creating Value.</em>
             </TextReveal>
           </h2>

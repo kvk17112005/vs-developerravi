@@ -86,7 +86,7 @@ function PageHero({ eyebrow, title, sub }: { eyebrow: string; title: React.React
             <span className="h-px w-9 bg-gold-500/70" />
           </div>
           <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-6xl">
-            <TextReveal mode="character">{title}</TextReveal>
+            <TextReveal>{title}</TextReveal>
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-forest-900/65 sm:text-lg">
             <ScrollText>{sub}</ScrollText>

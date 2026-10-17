@@ -1,9 +1,31 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { PROJECTS } from "../data/site";
 import { cn } from "../utils/cn";
-import { Cta, EASE, Icon, Magnetic, useScrolled } from "./ui";
+import {
+  Cta,
+  EASE,
+  Icon,
+  Magnetic,
+  MOTION_CONFIG,
+  useScrolled,
+} from "./ui";
+
+function NavLabel({ children }: { children: ReactNode }) {
+  return (
+    <span className="nav-roll">
+      <motion.span
+        className="nav-roll-track"
+        whileHover={{ y: "-50%" }}
+        transition={{ duration: MOTION_CONFIG.hover.rollingText, ease: EASE }}
+      >
+        <span>{children}</span>
+        <span aria-hidden="true">{children}</span>
+      </motion.span>
+    </span>
+  );
+}
 
 export function Logo({
   light,
@@ -94,10 +116,10 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-7 lg:flex">
           <NavLink to="/" end className={navLink}>
-            Home
+            <NavLabel>Home</NavLabel>
           </NavLink>
           <NavLink to="/about" className={navLink}>
-            About Us
+            <NavLabel>About Us</NavLabel>
           </NavLink>
           <div
             className="relative"
@@ -105,8 +127,10 @@ export default function Navbar() {
             onMouseLeave={() => setMega(false)}
           >
             <NavLink to="/projects" className={navLink}>
-              Our Projects
-              <Icon name="chevL" className={cn("ml-1.5 inline h-3 w-3 -rotate-90 transition-transform", mega && "rotate-90")} />
+              <NavLabel>
+                Our Projects
+                <Icon name="chevL" className={cn("ml-1.5 inline h-3 w-3 -rotate-90 transition-transform", mega && "rotate-90")} />
+              </NavLabel>
             </NavLink>
             <AnimatePresence>
               {mega && (
@@ -162,13 +186,13 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
           <NavLink to="/gallery" className={navLink}>
-            Gallery
+            <NavLabel>Gallery</NavLabel>
           </NavLink>
           <NavLink to="/careers" className={navLink}>
-            Careers
+            <NavLabel>Careers</NavLabel>
           </NavLink>
           <NavLink to="/contact" className={navLink}>
-            Contact
+            <NavLabel>Contact</NavLabel>
           </NavLink>
         </nav>
 

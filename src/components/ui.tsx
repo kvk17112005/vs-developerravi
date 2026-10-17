@@ -6,7 +6,6 @@ import {
   useScroll,
   useSpring,
   useTransform,
-  useReducedMotion,
   type MotionValue,
 } from "framer-motion";
 import {
@@ -22,9 +21,46 @@ import {
 import { Link } from "react-router-dom";
 import { cn } from "../utils/cn";
 import { SITE, TRUST_BADGES } from "../data/site";
+import { useReducedMotion } from "../utils/useReducedMotion";
 
-export const EASE = [0.22, 1, 0.36, 1] as const;
-export const EASE_LUX = [0.65, 0, 0.35, 1] as const;
+export const MOTION_CONFIG = {
+  ease: [0.16, 1, 0.3, 1] as const,
+  reveal: {
+    duration: 0.82,
+    distance: 40,
+    viewportAmount: 0.15,
+    viewportMargin: "-15% 0px",
+  },
+  text: { wordDuration: 0.7, wordStagger: 0.07, maxStagger: 14 },
+  cards: {
+    duration: 0.9,
+    stagger: 0.1,
+    distance: 40,
+    lift: 8,
+    imageScale: 1.06,
+    parallaxScale: 1.08,
+    parallaxHoverScale: 1.14,
+    imageDuration: 0.9,
+  },
+  hover: { duration: 0.28, rollingText: 0.4 },
+  hero: {
+    eyebrowDelay: 0.18,
+    headingDelay: 0.32,
+    bodyDelay: 0.5,
+    ctaDelay: 0.66,
+    eyebrowDuration: 0.7,
+    headingDuration: 0.9,
+    bodyDuration: 0.8,
+    ctaDuration: 0.8,
+    imageDuration: 0.9,
+  },
+  progress: { stiffness: 120, damping: 30, restDelta: 0.001 },
+  counters: { duration: 2 },
+  page: { duration: 0.5, distance: 12 },
+} as const;
+
+export const EASE = MOTION_CONFIG.ease;
+export const EASE_LUX = MOTION_CONFIG.ease;
 
 export function CinematicSection({
   children,
@@ -35,27 +71,25 @@ export function CinematicSection({
 }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useIsDesktop();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 0.24, 1], prefersReducedMotion ? [0, 0, 0] : [36, 0, -8]);
+  const y = useTransform(
+    scrollYProgress,
+    [0, 0.24, 1],
+    prefersReducedMotion || !isDesktop ? [0, 0, 0] : [68, 0, -24],
+  );
   const scale = useTransform(
     scrollYProgress,
-    [0, 0.22, 0.72, 1],
-    prefersReducedMotion ? [1, 1, 1, 1] : [0.985, 1, 1, 0.975],
+    [0, 0.2, 0.74, 1],
+    prefersReducedMotion || !isDesktop ? [1, 1, 1, 1] : [0.94, 1, 1, 0.97],
   );
   const opacity = useTransform(
     scrollYProgress,
-    [0, 0.18, 0.8, 1],
-    prefersReducedMotion ? [1, 1, 1, 1] : [0.82, 1, 1, 0.94],
-  );
-  const filter = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.8, 1],
-    prefersReducedMotion
-      ? ["blur(0px)", "blur(0px)", "blur(0px)", "blur(0px)"]
-      : ["blur(1.5px)", "blur(0px)", "blur(0px)", "blur(0.8px)"],
+    [0, 0.16, 0.82, 1],
+    prefersReducedMotion || !isDesktop ? [1, 1, 1, 1] : [0.68, 1, 1, 0.88],
   );
 
   return (
@@ -64,7 +98,7 @@ export function CinematicSection({
       className={cn("relative z-10", !first && "-mt-[4vh]")}
     >
       <motion.div
-        style={{ y, scale, opacity, filter, transformOrigin: "top center" }}
+        style={{ y, scale, opacity, transformOrigin: "top center" }}
         className="relative"
       >
         {children}
@@ -333,11 +367,10 @@ export function useScrolled(threshold = 40) {
 export function Reveal({
   children,
   delay = 0,
-  y = 30,
+  y = MOTION_CONFIG.reveal.distance,
   x = 0,
   rotate = 0,
   scale = 0.985,
-  blur = 7,
   className,
   once = true,
 }: {
@@ -347,7 +380,6 @@ export function Reveal({
   x?: number;
   rotate?: number;
   scale?: number;
-  blur?: number;
   className?: string;
   once?: boolean;
 }) {
@@ -357,10 +389,12 @@ export function Reveal({
     <motion.div
       className={className}
       style={{ transformPerspective: 1200 }}
+      onMouseMove={(event) => updateCardSpotlight(event, true)}
+      onMouseLeave={(event) => updateCardSpotlight(event, false)}
       initial={
         prefersReducedMotion
           ? false
-          : { opacity: 0, y, x, rotateX: rotate, scale, filter: `blur(${blur}px)` }
+          : { opacity: 0, y, x, rotateX: rotate, scale }
       }
       whileInView={{
         opacity: 1,
@@ -368,14 +402,37 @@ export function Reveal({
         x: 0,
         rotateX: 0,
         scale: 1,
-        filter: "blur(0px)",
       }}
-      viewport={{ once, margin: "-70px" }}
-      transition={{ duration: 0.85, delay, ease: EASE }}
+      viewport={{
+        once,
+        amount: MOTION_CONFIG.reveal.viewportAmount,
+        margin: MOTION_CONFIG.reveal.viewportMargin,
+      }}
+      transition={{
+        duration: prefersReducedMotion ? 0 : MOTION_CONFIG.reveal.duration,
+        delay: prefersReducedMotion ? 0 : delay,
+        ease: EASE,
+      }}
     >
       {children}
     </motion.div>
   );
+}
+
+function updateCardSpotlight(event: ReactMouseEvent<HTMLDivElement>, visible: boolean) {
+  if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+  const card = target.closest<HTMLElement>(".hover-card");
+  if (!card) return;
+  if (!visible) {
+    card.style.setProperty("--spotlight-opacity", "0");
+    return;
+  }
+  const bounds = card.getBoundingClientRect();
+  card.style.setProperty("--spotlight-x", `${event.clientX - bounds.left}px`);
+  card.style.setProperty("--spotlight-y", `${event.clientY - bounds.top}px`);
+  card.style.setProperty("--spotlight-opacity", "1");
 }
 
 /* Shared grid stagger — wrap a grid in <StaggerGroup> and each card in
@@ -384,7 +441,7 @@ export function Reveal({
 export function StaggerGroup({
   children,
   className,
-  stagger = 0.09,
+  stagger = MOTION_CONFIG.cards.stagger,
   delay = 0,
   once = true,
 }: {
@@ -400,10 +457,19 @@ export function StaggerGroup({
       className={className}
       initial="hidden"
       whileInView="show"
-      viewport={{ once, margin: "-70px" }}
+      viewport={{
+        once,
+        amount: MOTION_CONFIG.reveal.viewportAmount,
+        margin: MOTION_CONFIG.reveal.viewportMargin,
+      }}
       variants={{
         hidden: {},
-        show: { transition: { staggerChildren: reduced ? 0 : stagger, delayChildren: delay } },
+        show: {
+          transition: {
+            staggerChildren: reduced ? 0 : stagger,
+            delayChildren: reduced ? 0 : delay,
+          },
+        },
       }}
     >
       {children}
@@ -414,7 +480,7 @@ export function StaggerGroup({
 export function StaggerItem({
   children,
   className,
-  y = 26,
+  y = MOTION_CONFIG.cards.distance,
 }: {
   children: ReactNode;
   className?: string;
@@ -424,9 +490,18 @@ export function StaggerItem({
   return (
     <motion.div
       className={className}
+      onMouseMove={(event) => updateCardSpotlight(event, true)}
+      onMouseLeave={(event) => updateCardSpotlight(event, false)}
       variants={{
         hidden: reduced ? { opacity: 1 } : { opacity: 0, y },
-        show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+        show: {
+          opacity: 1,
+          y: 0,
+          transition: {
+            duration: reduced ? 0 : MOTION_CONFIG.cards.duration,
+            ease: EASE,
+          },
+        },
       }}
     >
       {children}
@@ -492,15 +567,26 @@ function textContent(node: ReactNode): string {
 
 export function TextReveal({
   children,
-  mode = "word",
 }: {
   children: ReactNode;
-  mode?: "word" | "character";
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-72px" });
+  const inView = useInView(ref, {
+    once: true,
+    amount: MOTION_CONFIG.reveal.viewportAmount,
+    margin: MOTION_CONFIG.reveal.viewportMargin,
+  });
   const prefersReducedMotion = useReducedMotion();
   let revealIndex = 0;
+  const revealedState = { opacity: 1, y: "0%" };
+  const transitionFor = (index: number) => ({
+    duration: prefersReducedMotion ? 0 : MOTION_CONFIG.text.wordDuration,
+    delay: prefersReducedMotion
+      ? 0
+      : Math.min(index, MOTION_CONFIG.text.maxStagger) *
+        MOTION_CONFIG.text.wordStagger,
+    ease: EASE,
+  });
 
   const renderText = (node: ReactNode): ReactNode =>
     Children.map(node, (child) => {
@@ -510,67 +596,20 @@ export function TextReveal({
           .map((part) => {
             if (!part || /^\s+$/.test(part)) return part;
 
-            if (mode === "character") {
-              const startIndex = revealIndex;
-              const characters = Array.from(part).map((character) => {
-                const index = revealIndex++;
-                return (
-                  <motion.span
-                    key={`char-${index}`}
-                    className="inline-block"
-                    initial={
-                      prefersReducedMotion
-                        ? false
-                        : { opacity: 0, y: 9, filter: "blur(5px)" }
-                    }
-                    animate={
-                      inView
-                        ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                        : undefined
-                    }
-                    transition={{
-                      duration: 0.48,
-                      delay: index * 0.012,
-                      ease: EASE,
-                    }}
-                  >
-                    {character}
-                  </motion.span>
-                );
-              });
-              return (
-                <span
-                  key={`word-${startIndex}`}
-                  className="inline-block whitespace-nowrap"
-                >
-                  {characters}
-                </span>
-              );
-            }
-
             const index = revealIndex++;
             return (
-              <motion.span
-                key={`word-${index}`}
-                className="inline-block"
-                initial={
-                  prefersReducedMotion
-                    ? false
-                    : { opacity: 0, y: 12, filter: "blur(5px)" }
-                }
-                animate={
-                  inView
-                    ? { opacity: 1, y: 0, filter: "blur(0px)" }
-                    : undefined
-                }
-                transition={{
-                  duration: 0.55,
-                  delay: index * 0.055,
-                  ease: EASE,
-                }}
-              >
-                {part}
-              </motion.span>
+              <span key={`word-${index}`} className="text-reveal-mask inline-block">
+                <motion.span
+                  className="inline-block"
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: "110%" }}
+                  animate={
+                    prefersReducedMotion || inView ? revealedState : undefined
+                  }
+                  transition={transitionFor(index)}
+                >
+                  {part}
+                </motion.span>
+              </span>
             );
           });
       }
@@ -599,26 +638,17 @@ function ScrollWord({
   progress,
   index,
   total,
-  reduced,
 }: {
   children: ReactNode;
   progress: MotionValue<number>;
   index: number;
   total: number;
-  reduced: boolean;
 }) {
   const start = total > 1 ? index / total : 0;
   const end = total > 1 ? Math.min((index + 1.6) / total, 1) : 1;
-  const opacity = useTransform(progress, [start, end], [0.16, 1]);
-  const y = useTransform(progress, [start, end], [12, 0]);
-  const filter = useTransform(progress, [start, end], ["blur(6px)", "blur(0px)"]);
+  const opacity = useTransform(progress, [start, end], [0.15, 1]);
 
-  if (reduced) return <span className="scroll-word">{children}</span>;
-  return (
-    <motion.span className="scroll-word" style={{ opacity, y, filter }}>
-      {children}
-    </motion.span>
-  );
+  return <motion.span className="scroll-word" style={{ opacity }}>{children}</motion.span>;
 }
 
 export function ScrollText({
@@ -632,7 +662,7 @@ export function ScrollText({
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start 0.95", "start 0.55"],
+    offset: ["start 0.85", "end 0.4"],
   });
 
   let wordCount = 0;
@@ -647,6 +677,10 @@ export function ScrollText({
   };
   countWords(children);
   const total = Math.max(wordCount, 1);
+
+  if (prefersReducedMotion) {
+    return <span className={className}>{children}</span>;
+  }
 
   let i = 0;
   const renderText = (node: ReactNode): ReactNode =>
@@ -663,7 +697,6 @@ export function ScrollText({
                 progress={scrollYProgress}
                 index={idx}
                 total={total}
-                reduced={!!prefersReducedMotion}
               >
                 {part}
               </ScrollWord>
@@ -703,8 +736,12 @@ export function ParallaxImage({
   depth?: number;
 }) {
   const ref = useRef<HTMLImageElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, {
+    once: true,
+    margin: MOTION_CONFIG.reveal.viewportMargin,
+  });
   const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useIsDesktop();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -712,7 +749,7 @@ export function ParallaxImage({
   const y = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion ? [0, 0] : [-depth, depth],
+    prefersReducedMotion || !isDesktop ? [0, 0] : [-depth, depth],
   );
 
   return (
@@ -723,19 +760,34 @@ export function ParallaxImage({
       loading={loading}
       decoding={decoding}
       className={cn("will-change-transform", className)}
-      style={{ y, scale: prefersReducedMotion ? 1 : 1.08 }}
+      style={{
+        y,
+        scale:
+          prefersReducedMotion || !isDesktop
+            ? 1
+            : MOTION_CONFIG.cards.parallaxScale,
+      }}
       initial={
         prefersReducedMotion
           ? false
           : { opacity: 0.7, clipPath: "inset(0 0 100% 0)" }
       }
       animate={
-        inView
+        prefersReducedMotion
+          ? { opacity: 1, clipPath: "inset(0 0 0% 0)" }
+          : inView
           ? { opacity: 1, clipPath: "inset(0 0 0% 0)" }
           : undefined
       }
-      whileHover={prefersReducedMotion ? undefined : { scale: 1.13 }}
-      transition={{ duration: 0.8, ease: EASE }}
+      whileHover={
+        prefersReducedMotion || !isDesktop
+          ? undefined
+          : { scale: MOTION_CONFIG.cards.parallaxHoverScale }
+      }
+      transition={{
+        duration: prefersReducedMotion ? 0 : MOTION_CONFIG.cards.imageDuration,
+        ease: EASE,
+      }}
     />
   );
 }
@@ -768,7 +820,10 @@ export function ImageReveal({
   objectPosition?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once, margin: "-80px" });
+  const inView = useInView(ref, {
+    once,
+    margin: MOTION_CONFIG.reveal.viewportMargin,
+  });
   const reduced = useReducedMotion();
 
   return (
@@ -779,7 +834,11 @@ export function ImageReveal({
         animate={
           reduced || inView ? { clipPath: "inset(0 0 0% 0)", scale: 1 } : undefined
         }
-        transition={{ duration: 0.9, delay, ease: EASE }}
+        transition={{
+          duration: reduced ? 0 : MOTION_CONFIG.cards.imageDuration,
+          delay: reduced ? 0 : delay,
+          ease: EASE,
+        }}
       >
         <img
           src={src}
@@ -825,7 +884,10 @@ export function Magnetic({
       className={cn("inline-block", className)}
       style={{ x, y }}
       onMouseMove={(e: ReactMouseEvent) => {
-        if (prefersReducedMotion) return;
+        if (
+          prefersReducedMotion ||
+          !window.matchMedia("(hover: hover) and (pointer: fine)").matches
+        ) return;
         const r = ref.current?.getBoundingClientRect();
         if (!r) return;
         x.set((e.clientX - (r.left + r.width / 2)) * strength);
@@ -882,7 +944,7 @@ export function CountUp({
   to,
   suffix = "",
   prefix = "",
-  duration = 2.2,
+  duration = MOTION_CONFIG.counters.duration,
   className,
 }: {
   to: number;
@@ -892,7 +954,10 @@ export function CountUp({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const inView = useInView(ref, {
+    once: true,
+    margin: MOTION_CONFIG.reveal.viewportMargin,
+  });
   const prefersReducedMotion = useReducedMotion();
   const decimals = Number.isInteger(to) ? 0 : 1;
   const fmt = (v: number) =>
@@ -922,15 +987,21 @@ export function CountUp({
 }
 
 export function TrustBadges({ className }: { className?: string }) {
+  const reduced = useReducedMotion();
+
   return (
     <div className={cn("flex flex-wrap items-center gap-2.5", className)}>
       {TRUST_BADGES.map((b, i) => (
         <motion.div
           key={b}
-          initial={{ opacity: 0, y: 12, scale: 0.9 }}
+          initial={reduced ? false : { opacity: 0, y: 12, scale: 0.9 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: i * 0.08, duration: 0.55, ease: EASE }}
+          viewport={{ once: true, amount: MOTION_CONFIG.reveal.viewportAmount }}
+          transition={{
+            delay: reduced ? 0 : i * MOTION_CONFIG.cards.stagger,
+            duration: reduced ? 0 : 0.55,
+            ease: EASE,
+          }}
           className="flex items-center gap-2 rounded-full border border-forest-600/15 bg-white px-3.5 py-1.5 text-[11px] font-bold tracking-wide text-forest-700 shadow-sm"
         >
           <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-mint-200 text-forest-700">
@@ -1015,6 +1086,7 @@ export function Scroll3D({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useIsDesktop();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -1023,17 +1095,21 @@ export function Scroll3D({
   const rotateX = useTransform(
     scrollYProgress,
     [0, 0.45, 1],
-    prefersReducedMotion ? [0, 0, 0] : [intensity, 0, -intensity * 0.7],
+    prefersReducedMotion || !isDesktop
+      ? [0, 0, 0]
+      : [intensity, 0, -intensity * 0.7],
   );
   const scale = useTransform(
     scrollYProgress,
     [0, 0.5, 1],
-    prefersReducedMotion || !scaleEffect ? [1, 1, 1] : [0.94, 1, 0.96],
+    prefersReducedMotion || !isDesktop || !scaleEffect
+      ? [1, 1, 1]
+      : [0.94, 1, 0.96],
   );
   const opacity = useTransform(
     scrollYProgress,
     [0, 0.2, 0.8, 1],
-    prefersReducedMotion ? [1, 1, 1, 1] : [0.8, 1, 1, 0.85],
+    prefersReducedMotion || !isDesktop ? [1, 1, 1, 1] : [0.8, 1, 1, 0.85],
   );
 
   return (
@@ -1064,6 +1140,7 @@ export function Parallax3DLayer({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useIsDesktop();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -1072,7 +1149,7 @@ export function Parallax3DLayer({
   const y = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion ? [0, 0] : [-depth, depth],
+    prefersReducedMotion || !isDesktop ? [0, 0] : [-depth, depth],
   );
 
   return (

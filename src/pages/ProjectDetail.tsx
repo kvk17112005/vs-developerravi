@@ -1,6 +1,7 @@
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { lazy, Suspense, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
+import { useReducedMotion } from "../utils/useReducedMotion";
 import {
   CONTACT,
   getProject,
@@ -125,7 +126,7 @@ export default function ProjectDetail() {
             transition={{ delay: 0.25, duration: 0.8, ease: EASE }}
           >
             <h1 className="font-display text-5xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
-              <TextReveal mode="character">{project.name}</TextReveal>
+              <TextReveal>{project.name}</TextReveal>
             </h1>
             <p className="mt-3 flex items-center gap-2 text-sm font-semibold text-mint-200 sm:text-base">
               <Icon name="mapPin" className="h-4.5 w-4.5 text-gold-300" />
@@ -176,7 +177,7 @@ export default function ProjectDetail() {
                 </span>
               </div>
               <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-                  <TextReveal mode="character">{project.tagline}</TextReveal>
+                  <TextReveal>{project.tagline}</TextReveal>
               </h2>
             </Reveal>
             <Reveal delay={0.12}>

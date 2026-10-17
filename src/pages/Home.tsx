@@ -1,6 +1,14 @@
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  useScroll,
+  useTransform,
+  useMotionValueEvent,
+} from "framer-motion";
+import { Children, cloneElement, isValidElement, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { useReducedMotion } from "../utils/useReducedMotion";
 import {
   CONTACT,
   HERO_POSTER,
@@ -24,6 +32,7 @@ import {
   Icon,
   inputCls,
   Magnetic,
+  MOTION_CONFIG,
   Parallax3DLayer,
   Reveal,
   Scroll3D,
@@ -33,22 +42,117 @@ import {
   StaggerItem,
   TextReveal,
   TrustBadges,
+  useIsDesktop,
   usePageMeta,
 } from "../components/ui";
+
+function HeroLetterReveal({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const reduced = useReducedMotion();
+  let letterIndex = 0;
+
+  const renderLetters = (node: ReactNode): ReactNode =>
+    Children.map(node, (child) => {
+      if (typeof child === "string" || typeof child === "number") {
+        return String(child)
+          .split(/(\s+)/)
+          .map((part) => {
+            if (!part || /^\s+$/.test(part)) {
+              return <span key={`hero-space-${letterIndex++}`}>{part}</span>;
+            }
+
+            return (
+              <span
+                key={`hero-word-${letterIndex}`}
+                className="inline-block whitespace-nowrap"
+              >
+                {Array.from(part).map((letter) => {
+                  const index = letterIndex++;
+                  return (
+                    <span
+                      key={`hero-letter-${index}`}
+                      className="hero-letter-mask inline-block"
+                    >
+                      <motion.span
+                        className="inline-block"
+                        initial={reduced ? false : { opacity: 0, y: "-115%" }}
+                        animate={
+                          reduced || inView ? { opacity: 1, y: "0%" } : undefined
+                        }
+                        transition={{
+                          duration: reduced ? 0 : 0.55,
+                          delay: reduced ? 0 : Math.min(index, 44) * 0.014,
+                          ease: EASE,
+                        }}
+                      >
+                        {letter}
+                      </motion.span>
+                    </span>
+                  );
+                })}
+              </span>
+            );
+          });
+      }
+
+      if (isValidElement<{ children?: ReactNode }>(child)) {
+        return cloneElement(child, {
+          children: renderLetters(child.props.children),
+        });
+      }
+
+      return child;
+    });
+
+  const accessibleText = (node: ReactNode): string => {
+    if (typeof node === "string" || typeof node === "number") return String(node);
+    if (Array.isArray(node)) return node.map(accessibleText).join("");
+    if (isValidElement<{ children?: ReactNode }>(node)) {
+      return accessibleText(node.props.children);
+    }
+    return "";
+  };
+
+  return (
+    <span ref={ref} className="hero-letter-reveal">
+      <span className="sr-only">{accessibleText(children)}</span>
+      <span aria-hidden="true">{renderLetters(children)}</span>
+    </span>
+  );
+}
 
 function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const heroVisible = useRef(true);
+  const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useIsDesktop();
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
 
-  const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
-  const videoY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, -50]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.3]);
+  const videoScale = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion || !isDesktop ? [1, 1] : [1, 1.1],
+  );
+  const videoY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion || !isDesktop ? [0, 0] : [0, 100],
+  );
+  const contentY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion || !isDesktop ? [0, 0] : [0, -50],
+  );
+  const contentOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.8],
+    prefersReducedMotion || !isDesktop ? [1, 1] : [1, 0.3],
+  );
 
   const keepPlaying = (video: HTMLVideoElement) => {
     video.loop = true;
@@ -80,7 +184,16 @@ function Hero() {
 
   return (
     <section ref={heroRef} className="relative h-[100svh] min-h-[640px] overflow-hidden">
-      <motion.div style={{ scale: videoScale, y: videoY }} className="absolute inset-0 h-full w-full">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{
+          duration: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.imageDuration,
+          ease: EASE,
+        }}
+        style={{ scale: videoScale, y: videoY }}
+        className="absolute inset-0 h-full w-full"
+      >
         <video
           ref={videoRef}
           className="h-full w-full object-cover"
@@ -113,9 +226,13 @@ function Hero() {
       >
 
         <motion.p
-          initial={{ opacity: 0, y: 24 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.7, ease: EASE }}
+          transition={{
+            delay: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.eyebrowDelay,
+            duration: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.eyebrowDuration,
+            ease: EASE,
+          }}
           className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.32em] text-gold-300"
         >
           <span className="h-px w-10 bg-gold-400/80" />
@@ -123,22 +240,30 @@ function Hero() {
         </motion.p>
 
         <motion.h1
-          initial={{ opacity: 0, y: 34 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 34 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.9, ease: EASE }}
+          transition={{
+            delay: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.headingDelay,
+            duration: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.headingDuration,
+            ease: EASE,
+          }}
           className="mt-4 max-w-4xl font-display text-[42px] font-semibold leading-[1.04] tracking-tight text-white drop-shadow-xl sm:text-6xl lg:text-7xl"
         >
-          <TextReveal mode="character">
+          <HeroLetterReveal>
             Own a piece of Bengaluru's
             <span className="text-mint-200"> greenest </span>
             <em className="text-gold-300">future.</em>
-          </TextReveal>
+          </HeroLetterReveal>
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 24 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8, ease: EASE }}
+          transition={{
+            delay: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.bodyDelay,
+            duration: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.bodyDuration,
+            ease: EASE,
+          }}
           className="mt-5 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg"
         >
           <TextReveal>
@@ -148,9 +273,13 @@ function Hero() {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65, duration: 0.8, ease: EASE }}
+          transition={{
+            delay: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.ctaDelay,
+            duration: prefersReducedMotion ? 0 : MOTION_CONFIG.hero.ctaDuration,
+            ease: EASE,
+          }}
           className="mt-8 flex flex-wrap items-center gap-4"
         >
           <Magnetic>
@@ -166,9 +295,9 @@ function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={prefersReducedMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.9 }}
+          transition={{ delay: prefersReducedMotion ? 0 : 0.8, duration: prefersReducedMotion ? 0 : 0.9 }}
           className="mt-10 hidden md:block"
         >
           <TrustBadges />
@@ -176,9 +305,9 @@ function Hero() {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0 }}
+        initial={prefersReducedMotion ? false : { opacity: 0 }}
         animate={{ opacity: 1 }}
-          transition={{ delay: 1.1, duration: 1 }}
+        transition={{ delay: prefersReducedMotion ? 0 : 1.1, duration: prefersReducedMotion ? 0 : 1 }}
         className="absolute bottom-6 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-2 sm:flex"
       >
         <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/70">
@@ -187,8 +316,8 @@ function Hero() {
         <span className="relative h-9 w-5 rounded-full border border-white/40">
           <motion.span
             className="absolute left-1/2 top-1.5 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-gold-300"
-            animate={{ y: [0, 14, 0], opacity: [1, 0.2, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={prefersReducedMotion ? undefined : { y: [0, 14, 0], opacity: [1, 0.2, 1] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: EASE }}
           />
         </span>
       </motion.div>
@@ -353,7 +482,7 @@ function FeaturedProjects() {
               </span>
             </div>
             <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-              <TextReveal mode="character">
+              <TextReveal>
                 Three layouts.
                 <br />
                 One standard of <em className="text-forest-600">trust.</em>
@@ -485,6 +614,15 @@ function FeaturedProjects() {
 /* ------------------------------ services --------------------------- */
 
 function Services() {
+  const serviceImages = [
+    "/projects/rose/rose-1.jpg",
+    "/projects/heritage/heritage-4.jpg",
+    "/projects/yogitha/yogitha-1.jpg",
+    "/projects/heritage/heritage-5.jpg",
+    "/projects/rose/rose-6.jpg",
+    "/projects/yogitha/yogitha-8.jpg",
+  ];
+
   return (
     <section className="bg-mint-50 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -497,19 +635,33 @@ function Services() {
           }
           sub="From the first title search to your first concrete pour — everything a plotted-development partner should do, done properly."
         />
-        <StaggerGroup className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.09} delay={0.1}>
-          {SERVICES.map((s) => (
+        <StaggerGroup className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" stagger={0.12} delay={0.1}>
+          {SERVICES.map((s, index) => (
             <StaggerItem key={s.title} className="h-full">
               <Scroll3D intensity={8} className="h-full">
-                <div className="hover-card group h-full rounded-[1.75rem] border border-forest-600/10 bg-white p-7 transition duration-500 hover:-translate-y-1.5 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
-                  <div className="hover-icon flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition-colors duration-500 group-hover:bg-forest-600 group-hover:text-white">
+                <div className="hover-card group relative isolate flex h-full min-h-[260px] flex-col overflow-hidden rounded-[1.75rem] border border-forest-600/10 bg-white p-7 transition duration-500 hover:border-forest-600/25 hover:shadow-[0_30px_60px_-30px_rgba(23,86,49,0.35)]">
+                  <div className="pointer-events-none absolute -right-5 -top-7 h-40 w-40 overflow-hidden rounded-full border-[7px] border-white shadow-[0_16px_40px_-20px_rgba(15,61,35,0.55)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:rotate-6 group-hover:scale-110">
+                    <img
+                      src={serviceImages[index]}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <span className="pointer-events-none absolute right-[6.8rem] top-[6.8rem] h-3 w-3 rounded-full bg-gold-400 shadow-[0_0_0_5px_rgba(212,179,110,0.16)] transition-transform duration-700 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  <div className="hover-icon relative z-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-mint-100 text-forest-600 transition-colors duration-500 group-hover:bg-forest-600 group-hover:text-white">
                     <Icon name={s.icon} className="h-7 w-7" />
                   </div>
-                  <h3 className="hover-title mt-5 font-display text-xl font-semibold text-forest-900">
-                    {s.title}
-                  </h3>
-                  <p className="hover-desc mt-2.5 text-sm leading-relaxed text-forest-900/60">{s.desc}</p>
-                  <span className="mt-5 block h-[2px] w-8 rounded-full bg-gold-500 transition-all duration-500 group-hover:w-16" />
+                  <div className="relative z-10 mt-auto max-w-[88%] pt-8">
+                    <h3 className="hover-title font-display text-xl font-semibold text-forest-900">
+                      <TextReveal>{s.title}</TextReveal>
+                    </h3>
+                    <p className="hover-desc mt-2.5 max-w-[95%] text-sm leading-relaxed text-forest-900/60">
+                      <TextReveal>{s.desc}</TextReveal>
+                    </p>
+                    <span className="mt-5 block h-[2px] w-8 rounded-full bg-gold-500 transition-all duration-500 group-hover:w-16" />
+                  </div>
                 </div>
               </Scroll3D>
             </StaggerItem>
@@ -522,16 +674,78 @@ function Services() {
 
 /* ---------------------- why-vs section ---------------------- */
 
+const WHY_IMAGES = [
+  "/projects/rose/rose-1.jpg",
+  "/projects/yogitha/yogitha-1.jpg",
+  "/projects/heritage/heritage-4.jpg",
+  "/projects/rose/rose-6.jpg",
+  "/projects/yogitha/yogitha-8.jpg",
+  "/projects/heritage/heritage-5.jpg",
+];
+
 function WhySection() {
   const [active, setActive] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { amount: 0.25 });
+  const prefersReducedMotion = useReducedMotion();
+  const isDesktop = useIsDesktop();
+  const wheelRadius = isDesktop ? 184 : 150;
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+  const wheelRotation = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [0, -(WHY_STEPS.length - 1) * 60],
+  );
+
+  useMotionValueEvent(scrollYProgress, "change", (progress) => {
+    if (prefersReducedMotion) return;
+    const next = Math.min(
+      WHY_STEPS.length - 1,
+      Math.round(progress * (WHY_STEPS.length - 1)),
+    );
+    setActive((current) => (current === next ? current : next));
+  });
+
+  const goToStep = (index: number) => {
+    if (prefersReducedMotion) {
+      setActive(index);
+      return;
+    }
+
+    const section = sectionRef.current;
+    if (!section) return;
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const scrollDistance = section.offsetHeight - window.innerHeight;
+    const progress = index / (WHY_STEPS.length - 1);
+    window.scrollTo({
+      top: sectionTop + Math.max(0, scrollDistance) * progress,
+      behavior: "smooth",
+    });
+  };
 
   return (
-    <section className="relative overflow-hidden bg-forest-800 py-20 text-white sm:py-28">
-      <div className="paper-grain absolute inset-0 opacity-30" />
-      <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(46,125,79,0.35)_0%,transparent_70%)]" />
-      <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(201,161,90,0.18)_0%,transparent_70%)]" />
+    <section
+      ref={sectionRef}
+      className={cn(
+        "relative overflow-x-clip bg-forest-800 text-white",
+        prefersReducedMotion ? "py-20 sm:py-28" : "h-[360svh]",
+      )}
+    >
+      <div
+        className={cn(
+          "relative overflow-hidden",
+          prefersReducedMotion && "py-20 sm:py-28",
+          !prefersReducedMotion && "sticky top-0 flex min-h-svh items-center",
+        )}
+      >
+        <div className="paper-grain absolute inset-0 opacity-30" />
+        <div className="absolute -left-32 top-0 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(46,125,79,0.35)_0%,transparent_70%)]" />
+        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-[radial-gradient(circle,rgba(201,161,90,0.18)_0%,transparent_70%)]" />
 
-      <div className="relative mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+        <div className="relative mx-auto grid w-full max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div className="flex flex-col justify-center">
           <Reveal>
             <div className="flex items-center gap-3">
@@ -541,7 +755,7 @@ function WhySection() {
               </span>
             </div>
             <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight sm:text-6xl text-white">
-              <TextReveal mode="character">
+              <TextReveal>
                 Why VS <em className="text-mint-300 font-normal italic">Developers?</em>
               </TextReveal>
             </h2>
@@ -556,19 +770,43 @@ function WhySection() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.35, ease: EASE }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+                animate={
+                  prefersReducedMotion || isInView
+                    ? { opacity: 1, y: 0 }
+                    : { opacity: 0, y: 18 }
+                }
+                exit={prefersReducedMotion ? undefined : { opacity: 0, y: -14 }}
+                transition={{ duration: prefersReducedMotion ? 0 : 0.55, ease: EASE }}
               >
-                <span className="font-display text-5xl font-semibold text-white/15">
+                <span className="sr-only">Reason {active + 1} of {WHY_STEPS.length}: </span>
+                <motion.span
+                  key={`number-${active}`}
+                  initial={prefersReducedMotion ? false : { opacity: 0, y: 18, filter: "blur(6px)" }}
+                  animate={
+                    prefersReducedMotion || isInView
+                      ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                      : { opacity: 0, y: 18, filter: "blur(6px)" }
+                  }
+                  transition={{ duration: prefersReducedMotion ? 0 : 0.6, ease: EASE }}
+                  aria-hidden="true"
+                  className="block font-display text-5xl font-semibold text-white/20"
+                >
                   0{active + 1}
-                </span>
+                </motion.span>
                 <h3 className="mt-2 font-display text-3xl font-semibold text-gold-300">
-                  {WHY_STEPS[active].title}
+                  <AnimatedWords
+                    text={WHY_STEPS[active].title}
+                    activeKey={active}
+                    inView={isInView}
+                  />
                 </h3>
                 <p className="mt-3 max-w-md leading-relaxed text-white/70">
-                  {WHY_STEPS[active].desc}
+                  <AnimatedWords
+                    text={WHY_STEPS[active].desc}
+                    activeKey={active}
+                    inView={isInView}
+                  />
                 </p>
               </motion.div>
             </AnimatePresence>
@@ -576,7 +814,7 @@ function WhySection() {
               {WHY_STEPS.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setActive(i)}
+                  onClick={() => goToStep(i)}
                   aria-label={`Step ${i + 1}`}
                   className={cn(
                     "h-1.5 rounded-full transition-all duration-300 cursor-pointer",
@@ -588,46 +826,189 @@ function WhySection() {
           </div>
         </div>
 
-        <StaggerGroup
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:content-center"
-          stagger={0.08}
-          delay={0.15}
+        <div
+          className="relative mx-auto flex h-[390px] w-full max-w-[620px] items-center justify-center overflow-hidden sm:h-[440px] lg:h-[500px]"
+          style={{ perspective: "1100px" }}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Reasons to choose VS Developers. Scroll to rotate through all six reasons."
         >
-          {WHY_STEPS.map((s, i) => (
-            <StaggerItem key={s.title} className="h-full">
-              <button
-                onClick={() => setActive(i)}
-                className={cn(
-                  "flex h-full w-full flex-col items-start gap-3 rounded-3xl border p-6 text-left transition-all duration-300 cursor-pointer sm:p-7",
-                  i === active
-                    ? "border-gold-400/60 bg-white text-forest-900 shadow-2xl scale-[1.02]"
-                    : "border-white/10 bg-white/5 text-white hover:-translate-y-1 hover:bg-white/10 hover:border-white/20"
-                )}
+          <motion.div
+            className="relative h-0 w-0"
+            initial={
+              prefersReducedMotion ? false : { opacity: 0, y: 26, scale: 0.94 }
+            }
+            animate={{
+              opacity: prefersReducedMotion || isInView ? 1 : 0,
+              y: prefersReducedMotion || isInView ? 0 : 26,
+              scale: prefersReducedMotion || isInView ? 1 : 0.94,
+            }}
+            style={{
+              transformStyle: "preserve-3d",
+              rotateY: prefersReducedMotion ? 0 : wheelRotation,
+            }}
+            transition={{
+              duration: prefersReducedMotion ? 0 : 1.05,
+              ease: EASE,
+            }}
+          >
+            {WHY_STEPS.map((s, i) => (
+              <div
+                key={s.title}
+                className="absolute left-1/2 top-1/2 h-[245px] w-[220px] sm:h-[260px] sm:w-[260px]"
+                style={{
+                  transform: `translate(-50%, -50%) rotateY(${i * 60}deg) translateZ(${wheelRadius}px)`,
+                  backfaceVisibility: "hidden",
+                  transformStyle: "preserve-3d",
+                }}
               >
-                <span
+                <motion.button
+                  onClick={() => goToStep(i)}
+                  tabIndex={i === active ? 0 : -1}
+                  aria-label={`${s.title}${i === active ? ", selected" : ""}`}
+                  aria-pressed={i === active}
                   className={cn(
-                    "flex h-12 w-12 items-center justify-center rounded-2xl transition-colors duration-300",
+                    "group flex h-full w-full flex-col overflow-hidden rounded-3xl border text-left shadow-[0_24px_60px_-24px_rgba(0,0,0,0.5)] transition-[border-color,background-color,box-shadow,opacity] duration-700",
+                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-300",
                     i === active
-                      ? "bg-mint-100 text-forest-600"
-                      : "bg-white/10 text-mint-200"
+                      ? "border-gold-300/80 bg-white text-forest-900 shadow-[0_30px_80px_-24px_rgba(0,0,0,0.55)]"
+                      : "border-white/15 bg-forest-900/90 text-white/90",
                   )}
+                  animate={{
+                    opacity: i === active ? 1 : 0.55,
+                    scale: i === active ? 1 : 0.88,
+                  }}
+                  transition={{
+                    duration: prefersReducedMotion ? 0 : 0.65,
+                    ease: EASE,
+                  }}
                 >
-                  <Icon name={s.icon} className="h-6 w-6" />
-                </span>
-                <span
-                  className={cn(
-                    "font-display text-base font-semibold leading-snug sm:text-lg",
-                    i === active ? "text-forest-900" : "text-white/85"
-                  )}
-                >
-                  {s.title}
-                </span>
-              </button>
-            </StaggerItem>
-          ))}
-        </StaggerGroup>
+                  <span className="relative block h-[88px] w-full shrink-0 overflow-hidden">
+                    <motion.img
+                      src={WHY_IMAGES[i]}
+                      alt=""
+                      aria-hidden="true"
+                      loading={i === active ? "eager" : "lazy"}
+                      decoding="async"
+                      className="h-full w-full object-cover"
+                      animate={{ scale: i === active ? 1.06 : 1 }}
+                      transition={{
+                        duration: prefersReducedMotion ? 0 : 1.1,
+                        ease: EASE,
+                      }}
+                    />
+                    <span className="absolute inset-0 bg-gradient-to-t from-forest-900/65 via-forest-900/10 to-transparent" />
+                    <span
+                      className={cn(
+                        "absolute bottom-3 left-4 flex h-11 w-11 items-center justify-center rounded-2xl shadow-lg transition-colors duration-500",
+                        i === active
+                          ? "bg-white text-forest-600"
+                          : "bg-forest-900/65 text-mint-200 backdrop-blur-sm",
+                      )}
+                    >
+                      <Icon name={s.icon} className="h-5 w-5" />
+                    </span>
+                  </span>
+                  <span
+                    className={cn(
+                      "flex min-h-0 flex-1 flex-col justify-center px-4 py-3 sm:px-5",
+                      i !== active && "invisible",
+                    )}
+                    aria-hidden={i !== active}
+                  >
+                    <span
+                      className={cn(
+                        "font-display text-base font-semibold leading-tight sm:text-lg",
+                        i === active ? "text-forest-900" : "text-white/90",
+                      )}
+                    >
+                      {i === active ? (
+                        <AnimatedWords
+                          text={s.title}
+                          activeKey={active}
+                          inView={isInView}
+                        />
+                      ) : (
+                        s.title
+                      )}
+                    </span>
+                    <span
+                      className={cn(
+                        "mt-1.5 line-clamp-3 text-[11px] leading-[1.35] sm:text-xs",
+                        i === active ? "text-forest-800/75" : "text-white/70",
+                      )}
+                    >
+                      {i === active ? (
+                        <AnimatedWords
+                          text={s.desc}
+                          activeKey={active + WHY_STEPS.length}
+                          inView={isInView}
+                        />
+                      ) : (
+                        s.desc
+                      )}
+                    </span>
+                  </span>
+                  <span
+                    className={cn(
+                      "mx-4 mb-4 h-[2px] rounded-full transition-all duration-700 sm:mx-5 sm:mb-5",
+                      i === active ? "w-14 bg-gold-500" : "w-7 bg-white/25",
+                    )}
+                  />
+                </motion.button>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+        </div>
       </div>
     </section>
+  );
+}
+
+function AnimatedWords({
+  text,
+  activeKey,
+  inView,
+}: {
+  text: string;
+  activeKey: number;
+  inView: boolean;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  return (
+    <>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {text.split(/(\s+)/).map((part, index) =>
+          /^\s+$/.test(part) ? (
+            part
+          ) : (
+            <motion.span
+              key={`${activeKey}-${index}`}
+              className="inline-block"
+              initial={
+                prefersReducedMotion
+                  ? false
+                  : { opacity: 0.15, y: 12, filter: "blur(4px)" }
+              }
+              animate={
+                prefersReducedMotion || inView
+                  ? { opacity: 1, y: 0, filter: "blur(0px)" }
+                  : { opacity: 0.15, y: 12, filter: "blur(4px)" }
+              }
+              transition={{
+                duration: prefersReducedMotion ? 0 : 0.52,
+                delay: prefersReducedMotion ? 0 : Math.min(index, 16) * 0.035,
+                ease: EASE,
+              }}
+            >
+              {part}
+            </motion.span>
+          ),
+        )}
+      </span>
+    </>
   );
 }
 
@@ -736,7 +1117,7 @@ function ScheduleVisit() {
               </span>
             </div>
             <h2 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-5xl">
-              <TextReveal mode="character">
+              <TextReveal>
                 See the land.
                 <br />
                 Read the papers.

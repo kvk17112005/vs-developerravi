@@ -1,7 +1,15 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CONTACT, PROJECTS, TAGLINE, TRUST_BADGES } from "../data/site";
-import { EASE, Icon, Reveal, StaggerGroup, StaggerItem, WhatsAppGlyph } from "./ui";
+import {
+  EASE,
+  Icon,
+  Reveal,
+  StaggerGroup,
+  StaggerItem,
+  TextReveal,
+  WhatsAppGlyph,
+} from "./ui";
 import { Logo } from "./Navbar";
 
 const popIn = {
@@ -60,8 +68,10 @@ export default function Footer() {
           <StaggerItem>
             <Logo light />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/70">
-              {TAGLINE} Family-run plotted developments in Bengaluru East — approved,
-              green and ready to build on, since 2014.
+              <TextReveal>
+                {TAGLINE} Family-run plotted developments in Bengaluru East — approved,
+                green and ready to build on, since 2014.
+              </TextReveal>
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {TRUST_BADGES.slice(0, 4).map((b) => (
@@ -78,7 +88,7 @@ export default function Footer() {
 
           <StaggerItem>
             <h2 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
-              Explore
+              <TextReveal>Explore</TextReveal>
             </h2>
             <ul className="mt-5 space-y-3 text-sm">
               {[
@@ -103,7 +113,7 @@ export default function Footer() {
 
           <StaggerItem>
             <h2 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
-              Our Projects
+              <TextReveal>Our Projects</TextReveal>
             </h2>
             <ul className="mt-5 space-y-4 text-sm">
               {PROJECTS.map((p) => (
@@ -126,7 +136,7 @@ export default function Footer() {
 
           <StaggerItem>
             <h2 className="text-xs font-bold uppercase tracking-[0.26em] text-gold-400">
-              Head Office
+              <TextReveal>Head Office</TextReveal>
             </h2>
             <address className="mt-5 space-y-3.5 text-sm not-italic leading-relaxed text-white/70">
               <p className="flex gap-3">
@@ -157,9 +167,13 @@ export default function Footer() {
 
         <Reveal className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-7 text-xs text-white/45 sm:flex-row">
           <p>
-            © {new Date().getFullYear()} VS Developers, Bengaluru. All rights reserved.
+            <TextReveal>
+              © {new Date().getFullYear()} VS Developers, Bengaluru. All rights reserved.
+            </TextReveal>
           </p>
-          <p className="tracking-[0.22em] uppercase">A Trusted Property Partner.</p>
+          <p className="tracking-[0.22em] uppercase">
+            <TextReveal>A Trusted Property Partner.</TextReveal>
+          </p>
         </Reveal>
       </div>
     </footer>

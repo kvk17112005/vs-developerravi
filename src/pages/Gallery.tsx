@@ -84,7 +84,7 @@ export default function Gallery() {
               <span className="h-px w-9 bg-gold-500/70" />
             </div>
             <h1 className="mt-5 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-forest-900 sm:text-6xl">
-              <TextReveal mode="character">
+              <TextReveal>
                 Green, in <em className="text-forest-600">every frame.</em>
               </TextReveal>
             </h1>
